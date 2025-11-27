@@ -6,20 +6,39 @@
   --accent-green: #2ed573;
   --accent-yellow: #f1c40f;
   --text-white: #ffffff;
+  --text-gray: #a0a0a0;
+  --text-light-gray: #e0e0e0;
+  --text-muted: #666666;
+  --text-dim: rgba(255, 255, 255, 0.6);
+  --text-ghost-hover: rgba(255, 255, 255, 0.15);
+
+  --footer-bg: rgba(18, 18, 18, 0.95);
+  --card-dark: #2d3436;
+
+  --brand-red-alt: #ff4655;
+  --gradient-purple: #a29bfe;
+  --gradient-blue: #74b9ff;
+
   --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.03);
+  --glass-bg-hover: rgba(255, 255, 255, 0.08);
   --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-border-hover: rgba(255, 255, 255, 0.2);
+
   --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.4);
-  --font-main: "Bangers", cursive;
+  --font-main: 'Bangers', cursive;
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Bangers", cursive; /* Force Bangers on everything */
+  font-family: 'Bangers', cursive;
+  font-weight: 400;
 }
 
 body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background: radial-gradient(circle at top left, #4834d4, #130f40);
   color: var(--text-white);
   min-height: 100vh;
@@ -99,7 +118,7 @@ body {
 .btn {
   padding: 0.8rem 1.5rem;
   border-radius: 12px;
-  font-weight: 400; /* Bangers only has 400 */
+  font-weight: 400;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -131,5 +150,5 @@ body {
 }
 
 .btn-login span {
-  transform: skew(10deg); /* Counter skew text */
+  transform: skew(10deg);
 }

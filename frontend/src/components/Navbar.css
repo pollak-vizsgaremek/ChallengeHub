@@ -9,11 +9,15 @@
 
 .logo {
   font-size: 2.5rem;
-  font-weight: 400; /* Bangers is 400 */
+  font-weight: 400;
   font-style: italic;
   text-transform: uppercase;
   letter-spacing: 2px;
-  background: linear-gradient(to right, #fff, #a29bfe);
+  background: linear-gradient(
+    to right,
+    var(--text-white),
+    var(--gradient-purple)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);

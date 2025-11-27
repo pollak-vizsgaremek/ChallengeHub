@@ -1,24 +1,28 @@
 .main-title {
   font-size: 5rem;
-  font-weight: 400; /* Bangers is 400 */
+  font-weight: 400;
   font-style: italic;
   text-transform: uppercase;
   text-align: center;
-  line-height: 1.1; /* Increased to prevent clipping */
+  line-height: 1.1;
   text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   letter-spacing: 2px;
   position: relative;
   margin-bottom: 1rem;
-  padding: 10px 20px; /* Increased side padding, especially for the italic 'E' */
-  display: inline-block; /* Ensures padding wraps the text content properly */
+  padding: 10px 20px;
+  display: inline-block;
 }
 
 .main-title span {
   display: block;
-  background: linear-gradient(to bottom, #fff 40%, #74b9ff 100%);
+  background: linear-gradient(
+    to bottom,
+    var(--text-white) 40%,
+    var(--gradient-blue) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  padding-right: 15px; /* Extra space for the last italic letter */
+  padding-right: 15px;
 }
 
 .game-cards {
@@ -44,11 +48,11 @@
   flex-direction: column;
   justify-content: flex-end;
   padding: 2.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
 }
 
 .game-card::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -61,7 +65,7 @@
 }
 
 .game-card::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -92,7 +96,7 @@
 
 .card-title {
   font-size: 3rem;
-  font-weight: 400; /* Bangers is 400 */
+  font-weight: 400;
   font-style: italic;
   text-transform: uppercase;
   line-height: 0.9;
@@ -101,7 +105,7 @@
 }
 
 .card-subtitle {
-  font-size: 1.3rem; /* Increased slightly for Bangers */
+  font-size: 1.3rem;
   font-weight: 400;
   opacity: 0.9;
   text-transform: uppercase;
@@ -110,11 +114,10 @@
 
 /* Active/Sport Challenge Styles */
 .card-active {
-  background: #2d3436; /* Fallback */
+  background: var(--card-dark);
 }
 .card-active::before {
-  /* Running / Fitness Image */
-  background-image: url("https://images.unsplash.com/photo-1552674605-46d5c7248db2?q=80&w=1000&auto=format&fit=crop");
+  background-image: url('https://images.unsplash.com/photo-1552674605-46d5c7248db2?q=80&w=1000&auto=format&fit=crop');
   filter: grayscale(20%) contrast(110%);
 }
 .card-active:hover::before {
@@ -126,11 +129,10 @@
 
 /* Custom/Other Challenge Styles */
 .card-custom {
-  background: #2d3436; /* Fallback */
+  background: var(--card-dark);
 }
 .card-custom::before {
-  /* Hiking / Adventure / Generic Challenge Image */
-  background-image: url("https://images.unsplash.com/photo-1501555088652-021faa106b9b?q=80&w=1000&auto=format&fit=crop");
+  background-image: url('https://images.unsplash.com/photo-1501555088652-021faa106b9b?q=80&w=1000&auto=format&fit=crop');
   filter: grayscale(20%) contrast(110%);
 }
 .card-custom:hover::before {
@@ -140,22 +142,25 @@
   color: var(--accent-green);
 }
 
-/* How to Play Section - Modern Redesign */
+/* How to Play Section */
 .how-to-play {
   margin-top: 5rem;
   width: 100%;
   text-align: center;
   padding: 0 1rem;
-  /* Removed heavy background for a cleaner look */
 }
 
 .how-to-title {
-  font-size: 2.5rem; /* Increased for Bangers */
+  font-size: 2.5rem;
   font-weight: 400;
   margin-bottom: 3rem;
   text-transform: uppercase;
   letter-spacing: 2px;
-  background: linear-gradient(to right, #fff, #a29bfe);
+  background: linear-gradient(
+    to right,
+    var(--text-white),
+    var(--gradient-purple)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   opacity: 0.8;
@@ -177,31 +182,31 @@
   text-align: center;
   transition: all 0.4s ease;
   position: relative;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--glass-bg-subtle);
+  border: 1px solid var(--glass-bg);
 }
 
 .step-card:hover {
   transform: translateY(-10px);
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .step-number {
-  font-size: 5rem; /* Bigger for Bangers */
+  font-size: 5rem;
   font-weight: 400;
   position: absolute;
   top: -30px;
   left: 50%;
   transform: translateX(-50%);
-  color: rgba(255, 255, 255, 0.05);
+  color: var(--glass-bg);
   z-index: 0;
   transition: all 0.3s ease;
 }
 
 .step-card:hover .step-number {
-  color: rgba(255, 255, 255, 0.15);
+  color: var(--text-ghost-hover);
   transform: translateX(-50%) scale(1.1);
 }
 
@@ -219,18 +224,18 @@
 }
 
 .step-title {
-  font-size: 1.8rem; /* Increased for Bangers */
+  font-size: 1.8rem;
   font-weight: 400;
   margin-bottom: 0.8rem;
-  color: #fff;
+  color: var(--text-white);
   text-transform: uppercase;
   position: relative;
   z-index: 1;
 }
 
 .step-desc {
-  font-size: 1.2rem; /* Increased for Bangers */
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.2rem;
+  color: var(--text-dim);
   line-height: 1.4;
   position: relative;
   z-index: 1;
@@ -251,9 +256,9 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--glass-border);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--glass-border-hover);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -263,7 +268,7 @@
 }
 
 .control-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-border-hover);
   transform: scale(1.1);
 }
 
