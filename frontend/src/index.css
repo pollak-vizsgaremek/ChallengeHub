@@ -147,8 +147,41 @@ body {
   background: var(--accent-yellow);
   color: #2d3436;
   transform: skew(-10deg);
+  text-decoration: none;
 }
 
 .btn-login span {
   transform: skew(10deg);
+}
+
+/* Loading Spinner */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background: radial-gradient(circle at top left, #4834d4, #130f40);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+
+.loader {
+  width: 60px;
+  height: 60px;
+  border: 6px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--accent-yellow);
+  border-right-color: var(--accent-green);
+  border-bottom-color: var(--accent-red);
+  border-left-color: var(--primary-purple);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

@@ -24,13 +24,13 @@ const Footer = () => {
                 <a href="/">Főoldal</a>
               </li>
               <li>
-                <a href="/challenges">Kihívások</a>
+                <a href="/kihivasok">Kihívások</a>
               </li>
               <li>
-                <a href="/shop">Bolt</a>
+                <a href="/bolt">Bolt</a>
               </li>
               <li>
-                <a href="/login">Belépés</a>
+                <a href="/bejelentkezes">Belépés</a>
               </li>
             </ul>
           </div>
@@ -42,10 +42,10 @@ const Footer = () => {
                 <a href="/aszf">ÁSZF</a>
               </li>
               <li>
-                <a href="/privacy">Adatvédelem</a>
+                <a href="/adatvedelem">Adatvédelem</a>
               </li>
               <li>
-                <a href="/contact">Kapcsolat</a>
+                <a href="/kapcsolat">Kapcsolat</a>
               </li>
             </ul>
           </div>

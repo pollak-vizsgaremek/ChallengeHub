@@ -1,10 +1,13 @@
-import React from "react";
-import "./Navbar.css";
+import React from 'react'
+import { Link } from 'react-router-dom'
+import './Navbar.css'
 
 const Navbar = () => {
   return (
     <nav className="navbar" data-aos="fade-down" data-aos-duration="1000">
-      <div className="logo">CHB</div>
+      <Link to="/" className="logo">
+        CHB
+      </Link>
       <div className="nav-actions">
         <button className="btn btn-shop">
           <svg
@@ -23,12 +26,12 @@ const Navbar = () => {
           </svg>
           Bolt
         </button>
-        <button className="btn btn-login">
+        <Link to="/bejelentkezes" className="btn btn-login">
           <span>BEJELENTKEZÉS</span>
-        </button>
+        </Link>
       </div>
     </nav>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar
