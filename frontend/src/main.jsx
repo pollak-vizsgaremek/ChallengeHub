@@ -4,6 +4,8 @@ import './index.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 const FooldalPage = lazy(() => import('./pages/Fooldal'))
+const ActiveChallengesPage = lazy(() => import('./pages/ActiveChallenges'))
+const CustomChallengesPage = lazy(() => import('./pages/CustomChallenges'))
 const ShopPage = lazy(() => import('./pages/Shop'))
 const LoginPage = lazy(() => import('./pages/Login'))
 const RegisterPage = lazy(() => import('./pages/Register'))
@@ -22,7 +24,10 @@ createRoot(document.getElementById('root')).render(
       >
         <Routes>
           <Route path="/" element={<FooldalPage />} />
-          <Route path="/shop" element={<ShopPage />} />
+          {/* Ideiglenses ez lesz a neve hogy aktiv-kihivasok */}
+          <Route path="/aktiv-kihivasok" element={<ActiveChallengesPage />} />
+          <Route path="/egyeni-kihivasok" element={<CustomChallengesPage />} />
+          <Route path="/bolt" element={<ShopPage />} />
           <Route path="/bejelentkezes" element={<LoginPage />} />
           <Route path="/regisztracio" element={<RegisterPage />} />
         </Routes>

@@ -13,7 +13,6 @@ const Music = () => {
       mirror: false,
     })
 
-    // Attempt to autoplay muted on load
     if (audioRef.current) {
       audioRef.current.volume = 0
       audioRef.current.play().catch((e) => console.log('Autoplay blocked:', e))

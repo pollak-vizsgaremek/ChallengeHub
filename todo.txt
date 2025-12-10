@@ -1,0 +1,8 @@
+1. Reszponívitás javítása minden oldalon
+2. Adatbázisba + xp és coin kell a felhasználónak és a tasknak 
+3. Üzlet oldalon ckéen a kérdőjelek helyére kép vagy ikonok. 
+4. Valahogy majd megkekll csinálnunk h a bolt oldalon h avesz valami akkor úgy tudja magát desginelni
+
+Megcsináltam az akítv és egyéni kihívások oldalnk a designjét. Még egyenlőre tömből jönnek az adatok
+majd megkell csinlni hogy adatbézisből jöjjön. Illetve majd csak ez akkor lehet látható habevan jelentkezve.
+Egyenlőre csak a design van kész!

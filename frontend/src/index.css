@@ -115,8 +115,6 @@ body {
 }
 
 /* Buttons */
-/* Buttons */
-/* Buttons */
 .btn {
   border: none;
   cursor: pointer;
@@ -241,12 +239,9 @@ body {
   transform: skew(-10deg) scale(0.98);
 }
 
-/* Reset skew for legacy span if needed */
 .btn-login span {
   transform: skew(0deg);
 }
-
-/* Apply counter-skew */
 .btn-login .login-icon-container,
 .btn-login .login-text-container {
   transform: skew(10deg);

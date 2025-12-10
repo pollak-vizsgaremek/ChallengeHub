@@ -9,7 +9,7 @@ const Navbar = () => {
         CHB
       </Link>
       <div className="nav-actions">
-        <Link to="/shop" className="btn btn-shop">
+        <Link to="/bolt" className="btn btn-shop">
           <svg
             width="24"
             height="24"

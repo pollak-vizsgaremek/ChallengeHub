@@ -1,9 +1,9 @@
-/* Shop Layout */
+/* Shop Page */
 .shop-container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 8rem 2rem 4rem; /* Top padding to account for fixed navbar if needed */
+  padding: 8rem 2rem 4rem; 
   display: flex;
   flex-direction: column;
   gap: 3rem;
@@ -135,7 +135,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: rgba(19, 15, 64, 0.4); /* Darkens the bottom half slightly */
+  background: rgba(19, 15, 64, 0.4);
   backdrop-filter: blur(10px);
 }
 
@@ -152,11 +152,10 @@
   color: var(--text-gray);
   margin-bottom: 1.5rem;
   line-height: 1.4;
-  flex-grow: 1; /* Pushes footer down */
+  flex-grow: 1;
   font-family: 'Inter', sans-serif;
 }
 
-/* Card Footer & Buy Button */
 .shop-card-footer {
   display: flex;
   justify-content: space-between;
