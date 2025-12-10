@@ -7,9 +7,12 @@ import { Link } from 'react-router-dom'
 import Navbar from '../components/navbar'
 import Footer from '../components/Footer'
 
+import HCaptcha from '@hcaptcha/react-hcaptcha'
+
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [captchaToken, setCaptchaToken] = useState('')
 
   useEffect(() => {
     AOS.init({
@@ -20,8 +23,10 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // Handle login logic here
-    console.log('Login attempt:', { email, password })
+    if (!captchaToken) {
+      alert('Kérlek igazold, hogy nem vagy robot!')
+      return
+    }
   }
 
   return (
@@ -115,6 +120,14 @@ const Login = () => {
                 <a href="#" className="forgot-password">
                   Elfelejtett jelszó?
                 </a>
+              </div>
+
+              <div className="captcha-container">
+                <HCaptcha
+                  sitekey="9738fd1e-909a-49d2-a5c2-bab085406aee"
+                  onVerify={(token) => setCaptchaToken(token)}
+                  theme="dark"
+                />
               </div>
 
               <button type="submit" className="btn btn-login full-width">

@@ -1,19 +1,32 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import './Register.css' // Using the specific CSS file for Register
 import { Link } from 'react-router-dom'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 
 import Navbar from '../components/navbar'
 import Footer from '../components/Footer'
 
 const Register = () => {
+  const [captchaToken, setCaptchaToken] = useState('')
+
   useEffect(() => {
     AOS.init({
       once: true,
       mirror: false,
     })
   }, [])
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (!captchaToken) {
+      alert('Kérlek igazold, hogy nem vagy robot!')
+      return
+    }
+    // Handle registration logic here
+    console.log('Registration attempt', { captchaToken })
+  }
 
   return (
     <>
@@ -39,7 +52,7 @@ const Register = () => {
               </p>
             </div>
 
-            <form className="register-form">
+            <form className="register-form" onSubmit={handleSubmit}>
               {/* Name Input */}
               <div className="input-group">
                 <div className="input-icon">
@@ -151,6 +164,14 @@ const Register = () => {
                   placeholder="Jelszó megerősítése"
                   className="modern-input"
                   required
+                />
+              </div>
+
+              <div className="captcha-container">
+                <HCaptcha
+                  sitekey="9738fd1e-909a-49d2-a5c2-bab085406aee"
+                  onVerify={(token) => setCaptchaToken(token)}
+                  theme="dark"
                 />
               </div>
 

@@ -20,6 +20,7 @@
     var(--text-white) 40%,
     var(--gradient-blue) 100%
   );
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   padding-right: 15px;
@@ -161,6 +162,7 @@
     var(--text-white),
     var(--gradient-purple)
   );
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   opacity: 0.8;
@@ -246,7 +248,7 @@
 .footer-controls {
   position: fixed;
   bottom: 2rem;
-  right: 2rem;
+  right: 6rem;
   display: flex;
   gap: 1rem;
   z-index: 10;

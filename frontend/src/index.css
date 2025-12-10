@@ -115,42 +115,140 @@ body {
 }
 
 /* Buttons */
+/* Buttons */
+/* Buttons */
 .btn {
-  padding: 0.8rem 1.5rem;
-  border-radius: 12px;
-  font-weight: 400;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   border: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1.2rem;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  justify-content: center;
+  font-family: 'Bangers', cursive;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-decoration: none;
+  transform: skew(-10deg);
+  -webkit-font-smoothing: antialiased;
+  backdrop-filter: blur(10px);
 }
 
-.btn:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+/* Ensure content inside doesn't look skewed */
+.btn > * {
+  transform: skew(10deg);
 }
 
 .btn-shop {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 15px;
+  padding: 0.5rem 1.2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  color: var(--text-white);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 90px;
+  height: 65px;
+}
+
+.btn-shop svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--accent-green);
+  transition: all 0.3s ease;
+}
+
+.btn-shop .btn-label {
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-white);
+  transition: all 0.3s ease;
+}
+
+.btn-shop:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--accent-green);
+  transform: skew(-10deg) translateY(-3px);
+  box-shadow: 0 8px 25px rgba(46, 213, 115, 0.2);
+}
+
+.btn-shop:hover svg {
+  stroke: var(--text-white);
+  transform: scale(1.1);
+}
+
+.btn-shop:active {
+  transform: skew(-10deg) scale(0.95);
 }
 
 .btn-login {
-  background: var(--accent-yellow);
+  background: linear-gradient(135deg, var(--accent-yellow), #f39c12);
   color: #2d3436;
-  transform: skew(-10deg);
-  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 0 2rem 0 1rem;
+  box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+  height: 65px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
 }
 
+.login-icon-container {
+  background: rgba(255, 255, 255, 0.2);
+  color: #2d3436;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+.login-text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 0.9;
+}
+
+.login-main-text {
+  font-size: 1.5rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: #2d3436;
+}
+
+.login-sub-text {
+  font-size: 0.8rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.7;
+}
+
+.btn-login:hover {
+  transform: skew(-10deg) translateY(-3px);
+  box-shadow: 0 8px 30px rgba(243, 156, 18, 0.5);
+  filter: brightness(1.1);
+}
+
+.btn-login:active {
+  transform: skew(-10deg) scale(0.98);
+}
+
+/* Reset skew for legacy span if needed */
 .btn-login span {
+  transform: skew(0deg);
+}
+
+/* Apply counter-skew */
+.btn-login .login-icon-container,
+.btn-login .login-text-container {
   transform: skew(10deg);
 }
 

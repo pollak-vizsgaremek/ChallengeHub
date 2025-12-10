@@ -139,6 +139,13 @@
   border-color: var(--accent-green);
 }
 
+.captcha-container {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+  width: 100%;
+}
+
 .checkmark:after {
   content: '';
   position: absolute;

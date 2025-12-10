@@ -4,12 +4,15 @@ import './index.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 const FooldalPage = lazy(() => import('./pages/Fooldal'))
+const ShopPage = lazy(() => import('./pages/Shop'))
 const LoginPage = lazy(() => import('./pages/Login'))
 const RegisterPage = lazy(() => import('./pages/Register'))
+import Music from './components/Music'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
+      <Music />
       <Suspense
         fallback={
           <div className="loading-container">
@@ -19,6 +22,7 @@ createRoot(document.getElementById('root')).render(
       >
         <Routes>
           <Route path="/" element={<FooldalPage />} />
+          <Route path="/shop" element={<ShopPage />} />
           <Route path="/bejelentkezes" element={<LoginPage />} />
           <Route path="/regisztracio" element={<RegisterPage />} />
         </Routes>
