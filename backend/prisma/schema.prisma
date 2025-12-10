@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -11,5 +5,97 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  //url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
+}
+
+model categories {
+  uuid                               String    @id @db.VarChar(36)
+  name                               String    @db.VarChar(255)
+  created_at                         DateTime  @default(now()) @db.DateTime(0)
+  created_by                         String    @db.VarChar(36)
+  updated_at                         DateTime? @db.DateTime(0)
+  updated_by                         String?   @db.VarChar(36)
+  users_categories_created_byTousers users     @relation("categories_created_byTousers", fields: [created_by], references: [uuid], onUpdate: Restrict, map: "categories_ibfk_1")
+  users_categories_updated_byTousers users?    @relation("categories_updated_byTousers", fields: [updated_by], references: [uuid], onDelete: Restrict, onUpdate: Restrict, map: "categories_ibfk_2")
+  tasks                              tasks[]
+
+  @@index([created_by, updated_by], map: "created_by")
+  @@index([updated_by], map: "updated_by")
+}
+
+model reviews {
+  uuid       String   @id @db.VarChar(36)
+  rating     Int
+  comment    String   @db.Text
+  task_id    String   @db.VarChar(36)
+  user_id    String   @db.VarChar(36)
+  created_at DateTime @default(now()) @db.DateTime(0)
+  users      users    @relation(fields: [user_id], references: [uuid], onUpdate: Restrict, map: "reviews_ibfk_1")
+  tasks      tasks    @relation(fields: [task_id], references: [uuid], onUpdate: Restrict, map: "reviews_ibfk_2")
+
+  @@index([task_id, user_id], map: "task_id")
+  @@index([user_id], map: "user_id")
+}
+
+model tasks {
+  uuid                          String       @id @db.VarChar(36)
+  name                          String       @db.VarChar(128)
+  description                   String       @db.Text
+  categories_id                 String       @db.VarChar(36)
+  created_at                    DateTime     @default(now()) @db.DateTime(0)
+  created_by                    String       @db.VarChar(36)
+  updated_at                    DateTime?    @db.DateTime(0)
+  updated_by                    String?      @db.VarChar(36)
+  reviews                       reviews[]
+  users_tasks_created_byTousers users        @relation("tasks_created_byTousers", fields: [created_by], references: [uuid], onUpdate: Restrict, map: "tasks_ibfk_1")
+  users_tasks_updated_byTousers users?       @relation("tasks_updated_byTousers", fields: [updated_by], references: [uuid], onDelete: Restrict, onUpdate: Restrict, map: "tasks_ibfk_2")
+  categories                    categories   @relation(fields: [categories_id], references: [uuid], onUpdate: Restrict, map: "tasks_ibfk_3")
+  user_tasks                    user_tasks[]
+
+  @@index([categories_id], map: "categories_id")
+  @@index([created_by, updated_by], map: "created_by")
+  @@index([updated_by], map: "updated_by")
+}
+
+model user_group {
+  uuid  String  @id @db.VarChar(36)
+  nev   String  @db.VarChar(128)
+  c     Boolean
+  r     Boolean
+  u     Boolean
+  d     Boolean
+  users users[]
+}
+
+model user_tasks {
+  uuid         String    @id @db.VarChar(36)
+  status       Int       @default(0) @db.TinyInt
+  task_id      String    @db.VarChar(36)
+  user_id      String    @db.VarChar(36)
+  created_at   DateTime  @default(now()) @db.DateTime(0)
+  completed_at DateTime? @db.DateTime(0)
+  users        users     @relation(fields: [user_id], references: [uuid], onUpdate: Restrict, map: "user_tasks_ibfk_1")
+  tasks        tasks     @relation(fields: [task_id], references: [uuid], onUpdate: Restrict, map: "user_tasks_ibfk_2")
+
+  @@index([task_id, user_id], map: "task_id")
+  @@index([user_id], map: "user_id")
+}
+
+model users {
+  uuid                                    String       @id @db.VarChar(36)
+  username                                String       @db.VarChar(128)
+  email                                   String       @unique(map: "email") @db.VarChar(255)
+  password                                String       @db.VarChar(255)
+  admin                                   Int          @default(0) @db.TinyInt
+  group_id                                String       @db.VarChar(36)
+  registered_at                           DateTime     @default(now()) @db.DateTime(0)
+  categories_categories_created_byTousers categories[] @relation("categories_created_byTousers")
+  categories_categories_updated_byTousers categories[] @relation("categories_updated_byTousers")
+  reviews                                 reviews[]
+  tasks_tasks_created_byTousers           tasks[]      @relation("tasks_created_byTousers")
+  tasks_tasks_updated_byTousers           tasks[]      @relation("tasks_updated_byTousers")
+  user_tasks                              user_tasks[]
+  user_group                              user_group   @relation(fields: [group_id], references: [uuid], onUpdate: Restrict, map: "users_ibfk_1")
+
+  @@index([group_id], map: "group_id")
 }
