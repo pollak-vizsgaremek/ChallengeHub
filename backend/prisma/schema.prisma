@@ -10,6 +10,7 @@ datasource db {
 
 model categories {
   uuid                               String    @id @db.VarChar(36)
+  type                               String    @db.VarChar(128)
   name                               String    @db.VarChar(255)
   created_at                         DateTime  @default(now()) @db.DateTime(0)
   created_by                         String    @db.VarChar(36)
@@ -38,9 +39,11 @@ model reviews {
 }
 
 model tasks {
-  uuid                          String       @id @db.VarChar(36)
+  uuid                          String       @id @default(uuid()) @db.VarChar(36)
   name                          String       @db.VarChar(128)
   description                   String       @db.Text
+  xp                            Int
+  coin                          Int
   categories_id                 String       @db.VarChar(36)
   created_at                    DateTime     @default(now()) @db.DateTime(0)
   created_by                    String       @db.VarChar(36)
@@ -58,7 +61,7 @@ model tasks {
 }
 
 model user_group {
-  uuid  String  @id @db.VarChar(36)
+  uuid  String  @id @default(uuid()) @db.VarChar(36)
   nev   String  @db.VarChar(128)
   c     Boolean
   r     Boolean
@@ -67,8 +70,19 @@ model user_group {
   users users[]
 }
 
+model user_interests {
+  uuid        String   @id @default(uuid()) @db.VarChar(36)
+  user_id     String   @db.VarChar(36)
+  category_id String   @db.VarChar(36)
+  created_at  DateTime @default(now()) @db.DateTime(0)
+
+  @@unique([user_id, category_id])
+  @@index([category_id])
+  @@index([user_id])
+}
+
 model user_tasks {
-  uuid         String    @id @db.VarChar(36)
+  uuid         String    @id @default(uuid()) @db.VarChar(36)
   status       Int       @default(0) @db.TinyInt
   task_id      String    @db.VarChar(36)
   user_id      String    @db.VarChar(36)
@@ -82,13 +96,19 @@ model user_tasks {
 }
 
 model users {
-  uuid                                    String       @id @db.VarChar(36)
+  uuid                                    String       @id @default(uuid()) @db.VarChar(36)
   username                                String       @db.VarChar(128)
   email                                   String       @unique(map: "email") @db.VarChar(255)
   password                                String       @db.VarChar(255)
-  admin                                   Int          @default(0) @db.TinyInt
+  xp                                      Int
+  coin                                    Int
   group_id                                String       @db.VarChar(36)
   registered_at                           DateTime     @default(now()) @db.DateTime(0)
+  onboarding_completed                    Boolean      @default(false)
+  activity_level                          String?      @db.VarChar(20)
+  current_streak                          Int          @default(0)
+  longest_streak                          Int          @default(0)
+  last_completed_at                       DateTime?    @db.DateTime(0)
   categories_categories_created_byTousers categories[] @relation("categories_created_byTousers")
   categories_categories_updated_byTousers categories[] @relation("categories_updated_byTousers")
   reviews                                 reviews[]

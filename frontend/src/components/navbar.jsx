@@ -1,8 +1,27 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import './Navbar.css'
 
 const Navbar = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const user = localStorage.getItem('user')
+    if (user) {
+      setIsLoggedIn(true)
+    }
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    localStorage.removeItem('user')
+    setIsLoggedIn(false)
+    navigate('/')
+    window.location.reload()
+  }
+
   return (
     <nav className="navbar" data-aos="fade-down" data-aos-duration="1000">
       <Link to="/" className="logo">
@@ -26,27 +45,51 @@ const Navbar = () => {
           </svg>
           <span className="btn-label">ÜZLET</span>
         </Link>
-        <Link to="/bejelentkezes" className="btn btn-login">
-          <div className="login-icon-container">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </div>
-          <div className="login-text-container">
-            <span className="login-main-text">JELENTKEZZ BE</span>
-            <span className="login-sub-text">A TOVÁBBIAKÉRT</span>
-          </div>
-        </Link>
+        {isLoggedIn ? (
+          <button onClick={handleLogout} className="btn btn-logout">
+            <div className="logout-icon-container">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+            </div>
+            <div className="logout-text-container">
+              <span className="logout-main-text">KIJELENTKEZÉS</span>
+            </div>
+          </button>
+        ) : (
+          <Link to="/bejelentkezes" className="btn btn-login">
+            <div className="login-icon-container">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <div className="login-text-container">
+              <span className="login-main-text">JELENTKEZZ BE</span>
+              <span className="login-sub-text">A TOVÁBBIAKÉRT</span>
+            </div>
+          </Link>
+        )}
       </div>
     </nav>
   )

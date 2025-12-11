@@ -239,11 +239,67 @@ body {
   transform: skew(-10deg) scale(0.98);
 }
 
+/* Skew fixes for children */
 .btn-login span {
   transform: skew(0deg);
 }
 .btn-login .login-icon-container,
 .btn-login .login-text-container {
+  transform: skew(10deg);
+}
+
+.btn-logout {
+  background: linear-gradient(135deg, var(--accent-red), #ff6b81);
+  color: var(--text-white);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 0 2rem 0 1rem;
+  box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+  height: 65px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logout-icon-container {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--text-white);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+.logout-text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 0.9;
+}
+
+.logout-main-text {
+  font-size: 1.5rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--text-white);
+}
+
+.btn-logout:hover {
+  transform: skew(-10deg) translateY(-3px);
+  box-shadow: 0 8px 30px rgba(255, 71, 87, 0.5);
+  filter: brightness(1.1);
+}
+
+.btn-logout:active {
+  transform: skew(-10deg) scale(0.98);
+}
+
+.btn-logout .logout-icon-container,
+.btn-logout .logout-text-container {
   transform: skew(10deg);
 }
 

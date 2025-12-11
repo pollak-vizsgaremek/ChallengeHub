@@ -1,0 +1,194 @@
+/* Onboarding Page */
+.onboarding-page {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.onboarding-card {
+  width: 100%;
+  max-width: 800px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 30px;
+  padding: 3rem;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+.onboarding-title {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: var(--text-white);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background: linear-gradient(to right, #fff, var(--gradient-blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.onboarding-subtitle {
+  font-size: 1.2rem;
+  color: var(--text-dim);
+  font-family: 'Inter', sans-serif;
+  margin-bottom: 3rem;
+}
+
+.categories-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+
+.category-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 2rem;
+  width: 180px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.category-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-5px);
+}
+
+.category-card.selected {
+  background: var(--primary-purple);
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 20px rgba(108, 92, 231, 0.4);
+}
+
+.category-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.category-name {
+  font-family: 'Bangers', cursive;
+  font-size: 1.5rem;
+  color: var(--text-white);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Activity Grid */
+.activity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.activity-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 2px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.activity-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.activity-card.selected {
+  border-color: var(--level-color);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 30px var(--level-color);
+}
+
+.activity-icon {
+  font-size: 3rem;
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+}
+
+.activity-name {
+  font-family: 'Bangers', cursive;
+  font-size: 1.8rem;
+  color: var(--text-white);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.activity-desc {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Actions */
+.onboarding-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.btn-continue {
+  background: linear-gradient(135deg, var(--accent-green), #26de81);
+  color: #2d3436;
+  font-size: 1.5rem;
+  padding: 1rem 3rem;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(46, 213, 115, 0.3);
+  border: none;
+  cursor: pointer;
+  font-family: 'Bangers', cursive;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.btn-continue:hover {
+  transform: skew(-10deg) translateY(-3px);
+  box-shadow: 0 15px 30px rgba(46, 213, 115, 0.5);
+}
+
+.btn-continue:active {
+  transform: skew(-10deg) scale(0.98);
+}
+
+.btn-continue:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 2px solid var(--text-dim);
+  color: var(--text-dim);
+  font-size: 1.5rem;
+  padding: 1rem 3rem;
+  border-radius: 15px;
+  cursor: pointer;
+  font-family: 'Bangers', cursive;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  border-color: var(--text-white);
+  color: var(--text-white);
+  transform: skew(-10deg) translateY(-3px);
+}

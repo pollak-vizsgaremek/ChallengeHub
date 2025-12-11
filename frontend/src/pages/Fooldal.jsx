@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import './Fooldal.css'
+import { Link } from 'react-router-dom'
 
 import Navbar from '../components/navbar'
 import Footer from '../components/Footer'
@@ -35,7 +36,8 @@ const Fooldal = () => {
 
           <div className="game-cards">
             {/* Active Challenge Card */}
-            <div
+            <Link
+              to="/aktiv-kihivasok"
               className="game-card card-active"
               data-aos="fade-right"
               data-aos-delay="200"
@@ -49,10 +51,11 @@ const Fooldal = () => {
                 </div>
                 <div className="card-subtitle">Fuss, Mozogj, Teljesíts</div>
               </div>
-            </div>
+            </Link>
 
             {/* Custom/Creative Challenge Card */}
-            <div
+            <Link
+              to="/egyeni-kihivasok"
               className="game-card card-custom"
               data-aos="fade-left"
               data-aos-delay="400"
@@ -66,7 +69,7 @@ const Fooldal = () => {
                 </div>
                 <div className="card-subtitle">Kreatív & Egyéb Feladatok</div>
               </div>
-            </div>
+            </Link>
           </div>
 
           {/* How to Play Section */}

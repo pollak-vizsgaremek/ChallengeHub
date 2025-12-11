@@ -9,7 +9,9 @@ const CustomChallengesPage = lazy(() => import('./pages/CustomChallenges'))
 const ShopPage = lazy(() => import('./pages/Shop'))
 const LoginPage = lazy(() => import('./pages/Login'))
 const RegisterPage = lazy(() => import('./pages/Register'))
+const OnboardingPage = lazy(() => import('./pages/Onboarding'))
 import Music from './components/Music'
+import ProtectedRoute from './guards/ProtectedRoute'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -24,9 +26,15 @@ createRoot(document.getElementById('root')).render(
       >
         <Routes>
           <Route path="/" element={<FooldalPage />} />
-          {/* Ideiglenses ez lesz a neve hogy aktiv-kihivasok */}
-          <Route path="/aktiv-kihivasok" element={<ActiveChallengesPage />} />
-          <Route path="/egyeni-kihivasok" element={<CustomChallengesPage />} />
+          <Route element={<ProtectedRoute />}>
+            {/* Ideiglenses ez lesz a neve hogy aktiv-kihivasok */}
+            <Route path="/aktiv-kihivasok" element={<ActiveChallengesPage />} />
+            <Route
+              path="/egyeni-kihivasok"
+              element={<CustomChallengesPage />}
+            />
+            <Route path="/kezdeti-lepesek" element={<OnboardingPage />} />
+          </Route>
           <Route path="/bolt" element={<ShopPage />} />
           <Route path="/bejelentkezes" element={<LoginPage />} />
           <Route path="/regisztracio" element={<RegisterPage />} />

@@ -2,14 +2,19 @@ import React, { useState, useEffect } from 'react'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import './Register.css' // Using the specific CSS file for Register
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 
 import Navbar from '../components/navbar'
 import Footer from '../components/Footer'
 
 const Register = () => {
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [captchaToken, setCaptchaToken] = useState('')
+  const navigate = useNavigate()
 
   useEffect(() => {
     AOS.init({
@@ -18,14 +23,48 @@ const Register = () => {
     })
   }, [])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!captchaToken) {
       alert('Kérlek igazold, hogy nem vagy robot!')
       return
     }
-    // Handle registration logic here
-    console.log('Registration attempt', { captchaToken })
+
+    if (password !== confirmPassword) {
+      alert('A jelszavak nem egyeznek!')
+      return
+    }
+
+    try {
+      const response = await fetch(
+        'http://localhost:3300/api/v1/auth/regisztracio',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username,
+            email,
+            password,
+            passwordConfirm: confirmPassword,
+            captchaToken,
+          }),
+        }
+      )
+
+      const data = await response.json()
+
+      if (response.ok) {
+        alert('Sikeres regisztráció! Most már bejelentkezhetsz.')
+        navigate('/bejelentkezes')
+      } else {
+        alert(data.message || 'Sikertelen regisztráció!')
+      }
+    } catch (error) {
+      console.error('Registration error:', error)
+      alert('Hálózati hiba történt!')
+    }
   }
 
   return (
@@ -74,6 +113,8 @@ const Register = () => {
                   type="text"
                   placeholder="Felhasználóneved"
                   className="modern-input"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
                 />
               </div>
@@ -99,6 +140,8 @@ const Register = () => {
                   type="email"
                   placeholder="Email címed"
                   className="modern-input"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
@@ -131,6 +174,8 @@ const Register = () => {
                   type="password"
                   placeholder="Jelszó"
                   className="modern-input"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                 />
               </div>
@@ -163,13 +208,15 @@ const Register = () => {
                   type="password"
                   placeholder="Jelszó megerősítése"
                   className="modern-input"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                 />
               </div>
 
               <div className="captcha-container">
                 <HCaptcha
-                  sitekey="9738fd1e-909a-49d2-a5c2-bab085406aee"
+                  sitekey="10000000-ffff-ffff-ffff-000000000001"
                   onVerify={(token) => setCaptchaToken(token)}
                   theme="dark"
                 />

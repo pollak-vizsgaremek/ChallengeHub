@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import './Login.css'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import Navbar from '../components/navbar'
 import Footer from '../components/Footer'
@@ -13,6 +13,7 @@ const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [captchaToken, setCaptchaToken] = useState('')
+  const navigate = useNavigate()
 
   useEffect(() => {
     AOS.init({
@@ -21,11 +22,58 @@ const Login = () => {
     })
   }, [])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!captchaToken) {
       alert('Kérlek igazold, hogy nem vagy robot!')
       return
+    }
+
+    try {
+      const response = await fetch(
+        'http://localhost:3300/api/v1/auth/bejelentkezes',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: email,
+            password,
+            captchaToken,
+          }),
+        }
+      )
+
+      const data = await response.json()
+
+      if (response.ok) {
+        // Save token and user info
+        localStorage.setItem('accessToken', data.accessToken)
+        localStorage.setItem('refreshToken', data.refreshToken)
+        localStorage.setItem(
+          'user',
+          JSON.stringify({
+            userId: data.userId,
+            username: data.username,
+            email: data.email,
+            isAdmin: data.isAdmin,
+            onboardingCompleted: data.onboardingCompleted,
+          })
+        )
+
+        // Redirect based on onboarding status
+        if (!data.onboardingCompleted) {
+          navigate('/kezdeti-lepesek')
+        } else {
+          navigate('/')
+        }
+      } else {
+        alert(data.message || 'Sikertelen bejelentkezés!')
+      }
+    } catch (error) {
+      console.error('Login error:', error)
+      alert('Hálózati hiba történt!')
     }
   }
 
@@ -69,8 +117,8 @@ const Login = () => {
                   </svg>
                 </div>
                 <input
-                  type="email"
-                  placeholder="Email címed"
+                  type="text"
+                  placeholder="Email cím vagy Felhasználónév"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="modern-input"
@@ -111,12 +159,10 @@ const Login = () => {
                 />
               </div>
 
-              <div className="form-options">
-                <label className="checkbox-container">
-                  <input type="checkbox" />
-                  <span className="checkmark"></span>
-                  Emlékezz rám
-                </label>
+              <div
+                className="form-options"
+                style={{ justifyContent: 'flex-end' }}
+              >
                 <a href="#" className="forgot-password">
                   Elfelejtett jelszó?
                 </a>
@@ -124,7 +170,7 @@ const Login = () => {
 
               <div className="captcha-container">
                 <HCaptcha
-                  sitekey="9738fd1e-909a-49d2-a5c2-bab085406aee"
+                  sitekey="10000000-ffff-ffff-ffff-000000000001"
                   onVerify={(token) => setCaptchaToken(token)}
                   theme="dark"
                 />

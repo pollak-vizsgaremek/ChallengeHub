@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import Navbar from '../components/navbar'
@@ -6,124 +6,137 @@ import Footer from '../components/Footer'
 import './ActiveChallenges.css'
 
 const ActiveChallenges = () => {
+  const [challenges, setChallenges] = useState([])
+  const [loading, setLoading] = useState(true)
   useEffect(() => {
     AOS.init({
       once: true,
       offset: 100,
       duration: 800,
     })
+    fetchChallenges()
   }, [])
 
-  //Ideiglenesen csak tömből raktam be az adatokat míg adatbázis nincs
-  const challenges = [
-    {
-      id: 1,
-      name: '5KM Futás',
-      description:
-        'Fuss le 5 kilométert egyhuzamban. Használj bármilyen futó applikációt a rögzítéshez.',
-      xp: 500,
-      coin: 100,
-      difficulty: 'Közepes',
-      icon: (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-          <line x1="4" y1="22" x2="4" y2="15"></line>
-        </svg>
-      ),
-    },
-    {
-      id: 2,
-      name: '100 Fekvőtámasz',
-      description:
-        'Nem kell egyben! A nap folyamán csinálj összesen 100 szabályos fekvőtámaszt.',
-      xp: 400,
-      coin: 80,
-      difficulty: 'Nehéz',
-      icon: (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M6.5 6.5h11"></path>
-          <path d="M6 16v-4h12v4"></path>
-          <rect x="2" y="10" width="20" height="12" rx="2"></rect>
-          <path d="M12 2v8"></path>
-        </svg>
-      ),
-    },
-    {
-      id: 3,
-      name: 'Lépcsőzés',
-      description:
-        'Mássz meg 1000 lépcsőfokot. Lehet lépcsőházban vagy edzőteremben.',
-      xp: 300,
-      coin: 50,
-      difficulty: 'Könnyű',
-      icon: (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="13 17 18 12 13 7"></polyline>
-          <polyline points="6 17 11 12 6 7"></polyline>
-        </svg>
-      ),
-    },
-    {
-      id: 4,
-      name: 'Plank Kihívás',
-      description: 'Tarts meg egy szabályos plank pozíciót legalább 2 percig.',
-      xp: 450,
-      coin: 90,
-      difficulty: 'Haladó',
-      icon: (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="12" cy="12" r="10"></circle>
-          <polyline points="12 6 12 12 16 14"></polyline>
-        </svg>
-      ),
-    },
-    {
-      id: 5,
-      name: 'Biciklizés',
-      description:
-        'Tekerj le 20 kilométert. Városi vagy terepkerékpározás is ér.',
-      xp: 600,
-      coin: 150,
-      difficulty: 'Közepes',
-      icon: (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="5.5" cy="17.5" r="3.5"></circle>
-          <circle cx="18.5" cy="17.5" r="3.5"></circle>
-          <path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"></path>
-        </svg>
-      ),
-    },
-  ]
+  const fetchChallenges = async () => {
+    try {
+      const userStr = localStorage.getItem('user')
+      if (!userStr) {
+        console.warn('User not found in localStorage. Cannot fetch challenges.')
+        setLoading(false)
+        return
+      }
+      const user = JSON.parse(userStr)
+
+      const response = await fetch(
+        `http://localhost:3300/api/v1/challenges/daily?userId=${user.userId}&type=active`
+      )
+      if (response.ok) {
+        const data = await response.json()
+        setChallenges(data)
+      } else {
+        console.error(
+          'Failed to fetch challenges:',
+          response.status,
+          response.statusText
+        )
+      }
+    } catch (error) {
+      console.error('Error fetching challenges:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const getCategoryIcon = (categoryName) => {
+    switch (categoryName) {
+      case 'Running':
+        return (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+            <line x1="4" y1="22" x2="4" y2="15"></line>
+          </svg>
+        )
+      case 'Strength':
+        return (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M18 2h-3a5 5 0 0 0-5 5v14a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3V7a5 5 0 0 0-5-5z"></path>
+            <path d="M14 9h4"></path>
+          </svg>
+        )
+      case 'Cardio':
+        return (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        )
+      default:
+        return (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+            <line x1="4" y1="22" x2="4" y2="15"></line>
+          </svg>
+        )
+    }
+  }
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="active-challenges-container">
+          <div className="ac-hero" data-aos="zoom-in">
+            <h1 className="ac-hero-title">
+              Aktív{' '}
+              <span style={{ color: 'var(--accent-red)' }}>Kihívások</span>
+            </h1>
+            <div className="ac-hero-subtitle">Mozogj. Küzdj. Győzz.</div>
+          </div>
+          <div className="challenges-grid">
+            <div
+              className="loading-container"
+              style={{
+                position: 'static',
+                background: 'transparent',
+                height: '300px',
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gridColumn: '1 / -1',
+              }}
+            >
+              <div className="loader"></div>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </>
+    )
+  }
 
   return (
     <>
@@ -142,45 +155,60 @@ const ActiveChallenges = () => {
         </div>
 
         <div className="challenges-grid">
-          {challenges.map((challenge, index) => (
-            <div
-              key={challenge.id}
-              className="challenge-card"
-              data-aos="fade-up"
-              data-aos-delay={index * 100}
-            >
-              <div className="challenge-icon">{challenge.icon}</div>
-              <div className="challenge-info">
-                <h3 className="challenge-name">{challenge.name}</h3>
-                <div className="challenge-meta">
-                  <span className="meta-chip xp">+{challenge.xp} XP</span>
-                  <div className="coin-reward-pill">
-                    <span className="coin-icon-small">🪙</span>
-                    <span>+{challenge.coin}</span>
-                  </div>
-                  <span className="meta-chip difficulty">
-                    {challenge.difficulty}
-                  </span>
-                </div>
-                <p className="challenge-desc">{challenge.description}</p>
-              </div>
-              <button className="btn-accept">
-                <span>Elfogadom</span>
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </button>
+          {challenges.length === 0 ? (
+            <div className="empty-state" data-aos="fade-up">
+              <div className="empty-icon">🏃‍♂️</div>
+              <h3>Nincs aktív kihívásod mára</h3>
+              <p>
+                Úgy tűnik, mára nincs elérhető feladat. Lehet, hogy nem
+                választottál "Sport" vagy "Aktív" típusú érdeklődési kört, vagy
+                már teljesítetted a mai limitet.
+              </p>
+              <button className="empty-btn">Kategóriák kezelése</button>
             </div>
-          ))}
+          ) : (
+            challenges.map((challenge, index) => (
+              <div
+                key={challenge.uuid || index}
+                className="challenge-card"
+                data-aos="fade-up"
+                data-aos-delay={index * 100}
+              >
+                <div className="challenge-icon">
+                  {getCategoryIcon(challenge.categories?.name)}
+                </div>
+                <div className="challenge-info">
+                  <h3 className="challenge-name">{challenge.name}</h3>
+                  <div className="challenge-meta">
+                    <span className="meta-chip xp">+{challenge.xp} XP</span>
+                    <div className="coin-reward-pill">
+                      <span className="coin-icon-small">🪙</span>
+                      <span>+{challenge.coin}</span>
+                    </div>
+                    <span className="meta-chip difficulty">
+                      {challenge.difficulty}
+                    </span>
+                  </div>
+                  <p className="challenge-desc">{challenge.description}</p>
+                </div>
+                <button className="btn-accept">
+                  <span>Elfogadom</span>
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </button>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
