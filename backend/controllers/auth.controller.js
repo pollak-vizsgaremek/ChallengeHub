@@ -50,7 +50,7 @@ router.post('/bejelentkezes', async (req, res) => {
   try {
     const data = await login(username, password)
 
-    if (!data) {
+    if (!data || data === -1) {
       return res
         .status(401)
         .json({ message: 'Hibás felhasználónév vagy jelszó!' })

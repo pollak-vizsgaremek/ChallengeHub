@@ -68,6 +68,8 @@ const Login = () => {
         } else {
           navigate('/')
         }
+        // Force update of Navbar component
+        window.dispatchEvent(new Event('storage'))
       } else {
         alert(data.message || 'Sikertelen bejelentkezés!')
       }

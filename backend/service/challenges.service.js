@@ -29,7 +29,7 @@ export const getDailyChallenges = async (userId, type) => {
 
   // 2. Determine daily limit based on activity level
   let limit = 3 // Default 'active'
-  if (user.activity_level === 'casual') limit = 1
+  if (user.activity_level === 'casual') limit = 3
   if (user.activity_level === 'hardcore') limit = 5
 
   // 3. Check for existing daily challenges

@@ -3,6 +3,7 @@ import AOS from 'aos'
 import 'aos/dist/aos.css'
 import Navbar from '../components/navbar'
 import Footer from '../components/Footer'
+import InterestsCTA from '../components/InterestsCTA'
 import './ActiveChallenges.css'
 
 const ActiveChallenges = () => {
@@ -108,14 +109,14 @@ const ActiveChallenges = () => {
       <>
         <Navbar />
         <div className="active-challenges-container">
-          <div className="ac-hero" data-aos="zoom-in">
-            <h1 className="ac-hero-title">
+          <div className="active-hero" data-aos="zoom-in">
+            <h1 className="active-hero-title">
               Aktív{' '}
               <span style={{ color: 'var(--accent-red)' }}>Kihívások</span>
             </h1>
-            <div className="ac-hero-subtitle">Mozogj. Küzdj. Győzz.</div>
+            <div className="active-hero-subtitle">Mozogj. Küzdj. Győzz.</div>
           </div>
-          <div className="challenges-grid">
+          <div className="active-challenges-grid">
             <div
               className="loading-container"
               style={{
@@ -133,6 +134,7 @@ const ActiveChallenges = () => {
             </div>
           </div>
         </div>
+        <InterestsCTA />
         <Footer />
       </>
     )
@@ -147,51 +149,55 @@ const ActiveChallenges = () => {
       <Navbar />
 
       <div className="active-challenges-container">
-        <div className="ac-hero" data-aos="zoom-in">
-          <h1 className="ac-hero-title">
+        <div className="active-hero" data-aos="zoom-in">
+          <h1 className="active-hero-title">
             Aktív <span style={{ color: 'var(--accent-red)' }}>Kihívások</span>
           </h1>
-          <div className="ac-hero-subtitle">Mozogj. Küzdj. Győzz.</div>
+          <div className="active-hero-subtitle">Mozogj. Küzdj. Győzz.</div>
         </div>
 
-        <div className="challenges-grid">
+        <div className="active-challenges-grid">
           {challenges.length === 0 ? (
-            <div className="empty-state" data-aos="fade-up">
-              <div className="empty-icon">🏃‍♂️</div>
+            <div className="active-empty-state" data-aos="fade-up">
+              <div className="active-empty-icon">🏃‍♂️</div>
               <h3>Nincs aktív kihívásod mára</h3>
               <p>
                 Úgy tűnik, mára nincs elérhető feladat. Lehet, hogy nem
                 választottál "Sport" vagy "Aktív" típusú érdeklődési kört, vagy
                 már teljesítetted a mai limitet.
               </p>
-              <button className="empty-btn">Kategóriák kezelése</button>
+              <button className="active-empty-btn">Kategóriák kezelése</button>
             </div>
           ) : (
             challenges.map((challenge, index) => (
               <div
                 key={challenge.uuid || index}
-                className="challenge-card"
+                className="active-challenge-card"
                 data-aos="fade-up"
                 data-aos-delay={index * 100}
               >
-                <div className="challenge-icon">
+                <div className="active-challenge-icon">
                   {getCategoryIcon(challenge.categories?.name)}
                 </div>
-                <div className="challenge-info">
-                  <h3 className="challenge-name">{challenge.name}</h3>
-                  <div className="challenge-meta">
-                    <span className="meta-chip xp">+{challenge.xp} XP</span>
-                    <div className="coin-reward-pill">
-                      <span className="coin-icon-small">🪙</span>
+                <div className="active-challenge-info">
+                  <h3 className="active-challenge-name">{challenge.name}</h3>
+                  <div className="active-challenge-meta">
+                    <span className="active-meta-chip xp">
+                      +{challenge.xp} XP
+                    </span>
+                    <div className="active-coin-reward-pill">
+                      <span className="active-coin-icon-small">🪙</span>
                       <span>+{challenge.coin}</span>
                     </div>
-                    <span className="meta-chip difficulty">
+                    <span className="active-meta-chip difficulty">
                       {challenge.difficulty}
                     </span>
                   </div>
-                  <p className="challenge-desc">{challenge.description}</p>
+                  <p className="active-challenge-desc">
+                    {challenge.description}
+                  </p>
                 </div>
-                <button className="btn-accept">
+                <button className="active-btn-accept">
                   <span>Elfogadom</span>
                   <svg
                     width="24"
@@ -212,6 +218,8 @@ const ActiveChallenges = () => {
         </div>
       </div>
 
+
+      <InterestsCTA />
       <Footer />
     </>
   )

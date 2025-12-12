@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import './Fooldal.css'
@@ -8,12 +8,48 @@ import Navbar from '../components/navbar'
 import Footer from '../components/Footer'
 
 const Fooldal = () => {
+  const [stats, setStats] = useState({
+    currentStreak: 0,
+    longestStreak: 0,
+    completedToday: false,
+  })
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
   useEffect(() => {
     AOS.init({
       once: true,
       mirror: false,
     })
+    checkLoginStatus()
   }, [])
+
+  const checkLoginStatus = () => {
+    const userStr = localStorage.getItem('user')
+    if (userStr) {
+      setIsLoggedIn(true)
+      fetchStats()
+    } else {
+      setIsLoggedIn(false)
+    }
+  }
+
+  const fetchStats = async () => {
+    try {
+      const userStr = localStorage.getItem('user')
+      if (!userStr) return
+      const user = JSON.parse(userStr)
+
+      const response = await fetch(
+        `http://localhost:3300/api/v1/users/stats?userId=${user.userId}`
+      )
+      if (response.ok) {
+        const data = await response.json()
+        setStats(data)
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error)
+    }
+  }
 
   return (
     <>
@@ -33,6 +69,36 @@ const Fooldal = () => {
             <span>CHALLENGE</span>
             <span>HUB</span>
           </h1>
+
+          {/* User Stats Section */}
+          {isLoggedIn && (
+            <div
+              className="dashboard-stats"
+              data-aos="fade-up"
+              data-aos-delay="100"
+            >
+              <div className="stat-item">
+                <div className="stat-label">Mai nap</div>
+                <div
+                  className={`stat-value ${
+                    stats.completedToday ? 'success' : ''
+                  }`}
+                >
+                  {stats.completedToday ? 'Teljesítve! 🎉' : 'Még hátravan ⏳'}
+                </div>
+              </div>
+              <div className="stat-divider"></div>
+              <div className="stat-item">
+                <div className="stat-label">Jelenlegi Streak</div>
+                <div className="stat-value">🔥 {stats.currentStreak} nap</div>
+              </div>
+              <div className="stat-divider"></div>
+              <div className="stat-item">
+                <div className="stat-label">Legjobb Streak</div>
+                <div className="stat-value">🏆 {stats.longestStreak} nap</div>
+              </div>
+            </div>
+          )}
 
           <div className="game-cards">
             {/* Active Challenge Card */}

@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { saveUserInterests } from '../service/user.service.js'
+import { getUserStats } from '../service/user.service.js'
 import { PrismaClient } from '../generated/prisma/client.js'
 
 const router = Router()
@@ -14,6 +15,22 @@ router.post('/erdelokdes', async (req, res) => {
   try {
     await saveUserInterests(userId, categories, activityLevel)
     res.status(200).json({ message: 'Érdeklődési körök mentve!' })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: 'Szerver hiba!' })
+  }
+})
+
+router.get('/stats', async (req, res) => {
+  const { userId } = req.query
+
+  if (!userId) {
+    return res.status(400).json({ message: 'UserId szükséges!' })
+  }
+
+  try {
+    const stats = await getUserStats(userId)
+    res.status(200).json(stats)
   } catch (error) {
     console.error(error)
     res.status(500).json({ message: 'Szerver hiba!' })

@@ -7,9 +7,16 @@ const Navbar = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const user = localStorage.getItem('user')
-    if (user) {
-      setIsLoggedIn(true)
+    const checkLogin = () => {
+      const user = localStorage.getItem('user')
+      setIsLoggedIn(!!user)
+    }
+
+    checkLogin()
+    window.addEventListener('storage', checkLogin)
+
+    return () => {
+      window.removeEventListener('storage', checkLogin)
     }
   }, [])
 

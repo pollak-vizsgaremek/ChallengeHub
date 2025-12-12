@@ -3,6 +3,7 @@ import AOS from 'aos'
 import 'aos/dist/aos.css'
 import Navbar from '../components/navbar'
 import Footer from '../components/Footer'
+import InterestsCTA from '../components/InterestsCTA'
 import './CustomChallenges.css'
 
 const CustomChallenges = () => {
@@ -140,14 +141,14 @@ const CustomChallenges = () => {
       <>
         <Navbar />
         <div className="custom-challenges-container">
-          <div className="ac-hero" data-aos="zoom-in">
-            <h1 className="ac-hero-title">
+          <div className="custom-hero" data-aos="zoom-in">
+            <h1 className="custom-hero-title">
               Egyéni{' '}
               <span style={{ color: 'var(--accent-green)' }}>Kihívások</span>
             </h1>
-            <div className="ac-hero-subtitle">Alkoss. Fejlődj. Élj.</div>
+            <div className="custom-hero-subtitle">Alkoss. Fejlődj. Élj.</div>
           </div>
-          <div className="challenges-grid">
+          <div className="custom-challenges-grid">
             <div
               className="loading-container"
               style={{
@@ -165,6 +166,7 @@ const CustomChallenges = () => {
             </div>
           </div>
         </div>
+        <InterestsCTA />
         <Footer />
       </>
     )
@@ -179,53 +181,57 @@ const CustomChallenges = () => {
       <Navbar />
 
       <div className="custom-challenges-container">
-        <div className="ac-hero" data-aos="zoom-in">
-          <h1 className="ac-hero-title">
+        <div className="custom-hero" data-aos="zoom-in">
+          <h1 className="custom-hero-title">
             Egyéni{' '}
             <span style={{ color: 'var(--accent-green)' }}>Kihívások</span>
           </h1>
-          <div className="ac-hero-subtitle">Alkoss. Fejlődj. Élj.</div>
+          <div className="custom-hero-subtitle">Alkoss. Fejlődj. Élj.</div>
         </div>
 
-        <div className="challenges-grid">
+        <div className="custom-challenges-grid">
           {challenges.length === 0 ? (
-            <div className="empty-state" data-aos="fade-up">
-              <div className="empty-icon">🧘</div>
+            <div className="custom-empty-state" data-aos="fade-up">
+              <div className="custom-empty-icon">🧘</div>
               <h3>Nincs egyéni kihívásod mára</h3>
               <p>
                 Úgy tűnik, mára nincs elérhető feladat. Ellenőrizd, hogy
                 vettél-e fel "Egyéni" (pl. Olvasás, Művészet) kategóriákat az
                 érdeklődési köreid közé!
               </p>
-              <button className="empty-btn">Kategóriák kezelése</button>
+              <button className="custom-empty-btn">Kategóriák kezelése</button>
             </div>
           ) : (
             challenges.map((challenge, index) => (
               <div
                 key={challenge.uuid || index}
-                className="challenge-card"
+                className="custom-challenge-card"
                 data-aos="fade-up"
                 data-aos-delay={index * 100}
               >
-                <div className="challenge-icon">
+                <div className="custom-challenge-icon">
                   {getCategoryIcon(challenge.categories?.name)}
                 </div>
-                <div className="challenge-info">
-                  <h3 className="challenge-name">{challenge.name}</h3>
-                  <div className="challenge-meta">
-                    <span className="meta-chip xp">+{challenge.xp} XP</span>
-                    <div className="coin-reward-pill">
-                      <span className="coin-icon-small">🪙</span>
+                <div className="custom-challenge-info">
+                  <h3 className="custom-challenge-name">{challenge.name}</h3>
+                  <div className="custom-challenge-meta">
+                    <span className="custom-meta-chip xp">
+                      +{challenge.xp} XP
+                    </span>
+                    <div className="custom-coin-reward-pill">
+                      <span className="custom-coin-icon-small">🪙</span>
                       <span>+{challenge.coin}</span>
                     </div>
-                    <span className="meta-chip difficulty">
+                    <span className="custom-meta-chip difficulty">
                       {/* Assuming difficulty is a field in tasks logic or we skip it if not present */}
                       {/* {challenge.difficulty} */ 'Közepes'}
                     </span>
                   </div>
-                  <p className="challenge-desc">{challenge.description}</p>
+                  <p className="custom-challenge-desc">
+                    {challenge.description}
+                  </p>
                 </div>
-                <button className="btn-accept">
+                <button className="custom-btn-accept">
                   <span>Elfogadom</span>
                   <svg
                     width="24"
@@ -246,6 +252,7 @@ const CustomChallenges = () => {
         </div>
       </div>
 
+      <InterestsCTA />
       <Footer />
     </>
   )

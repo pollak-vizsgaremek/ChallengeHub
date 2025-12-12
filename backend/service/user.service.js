@@ -80,3 +80,41 @@ export const updateStreak = async (userId) => {
 
   return newStreak
 }
+
+export const getUserStats = async (userId) => {
+  const user = await prisma.users.findUnique({
+    where: { uuid: userId },
+    select: {
+      current_streak: true,
+      longest_streak: true,
+      last_completed_at: true,
+    },
+  })
+
+  if (!user) {
+    //! Egyenlőre így lesz megoldva
+    throw new Error('User not found')
+  }
+
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+
+  let completedToday = false
+  if (user.last_completed_at) {
+    const lastDate = new Date(user.last_completed_at)
+    const lastDateMidnight = new Date(
+      lastDate.getFullYear(),
+      lastDate.getMonth(),
+      lastDate.getDate()
+    )
+    if (lastDateMidnight.getTime() === today.getTime()) {
+      completedToday = true
+    }
+  }
+
+  return {
+    currentStreak: user.current_streak || 0,
+    longestStreak: user.longest_streak || 0,
+    completedToday,
+  }
+}
