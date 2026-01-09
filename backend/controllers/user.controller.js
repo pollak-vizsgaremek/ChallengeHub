@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { saveUserInterests } from '../service/user.service.js'
-import { getUserStats } from '../service/user.service.js'
+import { getUserStats, getUserBalance } from '../service/user.service.js'
 import { PrismaClient } from '../generated/prisma/client.js'
 
 const router = Router()
@@ -31,6 +31,22 @@ router.get('/stats', async (req, res) => {
   try {
     const stats = await getUserStats(userId)
     res.status(200).json(stats)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: 'Szerver hiba!' })
+  }
+})
+
+router.get('/balance', async (req, res) => {
+  const { userId } = req.query
+
+  if (!userId) {
+    return res.status(400).json({ message: 'UserId szükséges!' })
+  }
+
+  try {
+    const balance = await getUserBalance(userId)
+    res.status(200).json({ coin: balance })
   } catch (error) {
     console.error(error)
     res.status(500).json({ message: 'Szerver hiba!' })

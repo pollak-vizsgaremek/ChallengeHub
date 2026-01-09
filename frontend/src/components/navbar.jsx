@@ -4,12 +4,25 @@ import './Navbar.css'
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [username, setUsername] = useState('')
   const navigate = useNavigate()
 
   useEffect(() => {
     const checkLogin = () => {
-      const user = localStorage.getItem('user')
-      setIsLoggedIn(!!user)
+      const userStr = localStorage.getItem('user')
+      if (userStr) {
+        setIsLoggedIn(true)
+        try {
+          const user = JSON.parse(userStr)
+          setUsername(user.username || 'Felhasználó')
+        } catch (error) {
+          console.error('Hibás user adat', error)
+          setIsLoggedIn(false)
+        }
+      } else {
+        setIsLoggedIn(false)
+        setUsername('')
+      }
     }
 
     checkLogin()
@@ -53,27 +66,32 @@ const Navbar = () => {
           <span className="btn-label">ÜZLET</span>
         </Link>
         {isLoggedIn ? (
-          <button onClick={handleLogout} className="btn btn-logout">
-            <div className="logout-icon-container">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-              </svg>
+          <>
+            <div className="navbar-user">
+              <span className="navbar-username">{username}</span>
             </div>
-            <div className="logout-text-container">
-              <span className="logout-main-text">KIJELENTKEZÉS</span>
-            </div>
-          </button>
+            <button onClick={handleLogout} className="btn btn-logout">
+              <div className="logout-icon-container">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+              </div>
+              <div className="logout-text-container">
+                <span className="logout-main-text">KIJELENTKEZÉS</span>
+              </div>
+            </button>
+          </>
         ) : (
           <Link to="/bejelentkezes" className="btn btn-login">
             <div className="login-icon-container">

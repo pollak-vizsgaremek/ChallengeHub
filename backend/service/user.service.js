@@ -118,3 +118,19 @@ export const getUserStats = async (userId) => {
     completedToday,
   }
 }
+
+export const getUserBalance = async (userId) => {
+  const user = await prisma.users.findUnique({
+    where: { uuid: userId },
+    select: {
+      coin: true,
+    },
+  })
+
+  // ! Itt is egyenlőre csak így dobom a hibát.
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  return user.coin
+}

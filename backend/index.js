@@ -5,6 +5,7 @@ import authController from './controllers/auth.controller.js'
 import categoryController from './controllers/category.controller.js'
 import userController from './controllers/user.controller.js'
 import challengesController from './controllers/challenges.controller.js'
+import shopController from './controllers/shop.controller.js'
 
 const app = express()
 
@@ -18,6 +19,7 @@ app.use('/api/v1/auth', authController)
 app.use('/api/v1/categories', categoryController)
 app.use('/api/v1/users', userController)
 app.use('/api/v1/challenges', challengesController)
+app.use('/api/v1/shop', shopController)
 
 app.listen(3300, () => {
   console.log('Elindult az alkalmazás')

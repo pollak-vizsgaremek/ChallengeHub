@@ -28,3 +28,20 @@
   gap: 1.5rem;
   align-items: center;
 }
+
+.navbar-user {
+  display: flex;
+  align-items: center;
+  margin-right: 0.5rem;
+}
+
+.navbar-username {
+  font-weight: 800;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(to right, #fff, #a5b4fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 20px rgba(165, 180, 252, 0.3);
+}
