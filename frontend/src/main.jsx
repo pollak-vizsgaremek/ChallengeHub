@@ -2,6 +2,7 @@ import { StrictMode, lazy, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 
 const FooldalPage = lazy(() => import('./pages/Fooldal'));
 const ActiveChallengesPage = lazy(() => import('./pages/ActiveChallenges'));
@@ -12,12 +13,32 @@ const RegisterPage = lazy(() => import('./pages/Register'));
 const OnboardingPage = lazy(() => import('./pages/Onboarding'));
 const ProfilePage = lazy(() => import('./pages/Profile'));
 import Music from './components/Music';
+import SessionManager from './components/SessionManager';
 import ProtectedRoute from './guards/ProtectedRoute';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: 'rgba(30, 30, 40, 0.95)',
+            color: '#fff',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+          },
+          success: {
+            iconTheme: { primary: '#10b981', secondary: '#fff' },
+          },
+          error: {
+            iconTheme: { primary: '#ef4444', secondary: '#fff' },
+          },
+        }}
+      />
       <Music />
+      <SessionManager />
       <Suspense
         fallback={
           <div className="loading-container">

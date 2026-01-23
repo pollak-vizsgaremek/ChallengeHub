@@ -1,55 +1,61 @@
-import React, { useEffect, useState } from 'react'
-import AOS from 'aos'
-import 'aos/dist/aos.css'
-import './Fooldal.css'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+import './Fooldal.css';
+import { Link } from 'react-router-dom';
 
-import Navbar from '../components/navbar'
-import Footer from '../components/Footer'
+import Navbar from '../components/navbar';
+import Footer from '../components/Footer';
 
 const Fooldal = () => {
   const [stats, setStats] = useState({
     currentStreak: 0,
     longestStreak: 0,
     completedToday: false,
-  })
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     AOS.init({
       once: true,
       mirror: false,
-    })
-    checkLoginStatus()
-  }, [])
+    });
+    checkLoginStatus();
+  }, []);
 
   const checkLoginStatus = () => {
-    const userStr = localStorage.getItem('user')
+    const userStr = localStorage.getItem('user');
     if (userStr) {
-      setIsLoggedIn(true)
-      fetchStats()
+      setIsLoggedIn(true);
+      fetchStats();
     } else {
-      setIsLoggedIn(false)
+      setIsLoggedIn(false);
     }
-  }
+  };
 
   const fetchStats = async () => {
     try {
-      const userStr = localStorage.getItem('user')
-      if (!userStr) return
-      const user = JSON.parse(userStr)
+      const userStr = localStorage.getItem('user');
+      if (!userStr) return;
+      const user = JSON.parse(userStr);
 
       const response = await fetch(
-        `http://localhost:3300/api/v1/users/stats?userId=${user.userId}`
-      )
+        `http://localhost:3300/api/v1/users/stats?userId=${user.userId}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        }
+      );
       if (response.ok) {
-        const data = await response.json()
-        setStats(data)
+        const data = await response.json();
+        setStats(data);
       }
     } catch (error) {
-      console.error('Error fetching stats:', error)
+      console.error('Error fetching stats:', error);
     }
-  }
+  };
 
   return (
     <>
@@ -247,7 +253,7 @@ const Fooldal = () => {
 
       <Footer />
     </>
-  )
-}
+  );
+};
 
-export default Fooldal
+export default Fooldal;

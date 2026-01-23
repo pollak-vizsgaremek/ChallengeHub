@@ -9,14 +9,14 @@ export async function authMiddleware(req, res, next) {
 
   // If no auth header is present
   if (!authHeader) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    return res.status(401).json({ message: 'Nincs jogosultságod!' });
   }
 
   const token = authHeader.split(' ')[1];
 
   // If no token is present
   if (!token) {
-    return res.status(401).json({ message: 'Invalid token format' });
+    return res.status(401).json({ message: 'Érvénytelen token formátum!' });
   }
 
   // Verify the token
@@ -31,6 +31,6 @@ export async function authMiddleware(req, res, next) {
     req.user = user;
     next();
   } catch (error) {
-    return res.status(401).json({ message: 'Invalid token or expired' });
+    return res.status(401).json({ message: 'Érvénytelen vagy lejárt token!' });
   }
 }

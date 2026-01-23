@@ -5,7 +5,7 @@ export default function endpointAccessMiddleware(req, res, next) {
 
   // If no user is found
   if (!user) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    return res.status(401).json({ message: 'Nincs jogosultságod!' });
   }
 
   // If the user is an admin
@@ -17,7 +17,7 @@ export default function endpointAccessMiddleware(req, res, next) {
 
   // If no accessed endpoints are found
   if (!accessedEndpoints || !Array.isArray(accessedEndpoints)) {
-    return res.status(403).json({ message: 'Access denied' });
+    return res.status(403).json({ message: 'Hozzáférés megtagadva!' });
   }
 
   const endpoint = req.originalUrl;
@@ -38,5 +38,5 @@ export default function endpointAccessMiddleware(req, res, next) {
     return next();
   }
 
-  return res.status(403).json({ message: 'Access denied' });
+  return res.status(403).json({ message: 'Hozzáférés megtagadva!' });
 }

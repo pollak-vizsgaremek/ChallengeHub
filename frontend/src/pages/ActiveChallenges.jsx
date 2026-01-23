@@ -1,52 +1,54 @@
-import React, { useEffect, useState } from 'react'
-import AOS from 'aos'
-import 'aos/dist/aos.css'
-import Navbar from '../components/navbar'
-import Footer from '../components/Footer'
-import InterestsCTA from '../components/InterestsCTA'
-import './ActiveChallenges.css'
+import React, { useEffect, useState } from 'react';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+import Navbar from '../components/navbar';
+import Footer from '../components/Footer';
+import InterestsCTA from '../components/InterestsCTA';
+import './ActiveChallenges.css';
 
 const ActiveChallenges = () => {
-  const [challenges, setChallenges] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [challenges, setChallenges] = useState([]);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     AOS.init({
       once: true,
       offset: 100,
       duration: 800,
-    })
-    fetchChallenges()
-  }, [])
+    });
+    fetchChallenges();
+  }, []);
 
   const fetchChallenges = async () => {
     try {
-      const userStr = localStorage.getItem('user')
+      const userStr = localStorage.getItem('user');
       if (!userStr) {
-        console.warn('User not found in localStorage. Cannot fetch challenges.')
-        setLoading(false)
-        return
+        console.warn(
+          'User not found in localStorage. Cannot fetch challenges.'
+        );
+        setLoading(false);
+        return;
       }
-      const user = JSON.parse(userStr)
+      const user = JSON.parse(userStr);
 
       const response = await fetch(
         `http://localhost:3300/api/v1/challenges/daily?userId=${user.userId}&type=active`
-      )
+      );
       if (response.ok) {
-        const data = await response.json()
-        setChallenges(data)
+        const data = await response.json();
+        setChallenges(data);
       } else {
         console.error(
           'Failed to fetch challenges:',
           response.status,
           response.statusText
-        )
+        );
       }
     } catch (error) {
-      console.error('Error fetching challenges:', error)
+      console.error('Error fetching challenges:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const getCategoryIcon = (categoryName) => {
     switch (categoryName) {
@@ -62,7 +64,7 @@ const ActiveChallenges = () => {
             <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
             <line x1="4" y1="22" x2="4" y2="15"></line>
           </svg>
-        )
+        );
       case 'Strength':
         return (
           <svg
@@ -75,7 +77,7 @@ const ActiveChallenges = () => {
             <path d="M18 2h-3a5 5 0 0 0-5 5v14a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3V7a5 5 0 0 0-5-5z"></path>
             <path d="M14 9h4"></path>
           </svg>
-        )
+        );
       case 'Cardio':
         return (
           <svg
@@ -87,7 +89,7 @@ const ActiveChallenges = () => {
           >
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
           </svg>
-        )
+        );
       default:
         return (
           <svg
@@ -100,9 +102,9 @@ const ActiveChallenges = () => {
             <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
             <line x1="4" y1="22" x2="4" y2="15"></line>
           </svg>
-        )
+        );
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -137,7 +139,7 @@ const ActiveChallenges = () => {
         <InterestsCTA />
         <Footer />
       </>
-    )
+    );
   }
 
   return (
@@ -221,7 +223,7 @@ const ActiveChallenges = () => {
       <InterestsCTA />
       <Footer />
     </>
-  )
-}
+  );
+};
 
-export default ActiveChallenges
+export default ActiveChallenges;

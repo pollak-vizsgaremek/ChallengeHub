@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import './Shop.css';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
+import toast from 'react-hot-toast';
 
 const Shop = () => {
   const [coins, setCoins] = useState(null);
@@ -11,6 +13,8 @@ const Shop = () => {
   const [shopItems, setShopItems] = useState([]);
   const [user, setUser] = useState(null);
   const [purchasedItems, setPurchasedItems] = useState(new Set());
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     AOS.init({ once: true, duration: 800 });
@@ -22,8 +26,10 @@ const Shop = () => {
       setUser(parsedUser);
       fetchUserBalance(parsedUser.userId);
       fetchPurchasedItems(parsedUser.userId);
+    } else {
+      navigate('/bejelentkezes');
     }
-  }, []);
+  }, [navigate]);
 
   // Fetch user balance
   const fetchUserBalance = async (userId) => {
@@ -98,13 +104,13 @@ const Shop = () => {
   // Handle buy
   const handleBuy = async (item) => {
     if (!user) {
-      alert('Kérlek jelentkezz be a vásárláshoz!');
+      toast.error('Kérlek jelentkezz be a vásárláshoz!');
       return;
     }
 
     // Check if user has enough coins
     if (item.price > coins) {
-      alert('Nincs elég pénzed!');
+      toast.error('Nincs elég pénzed!');
       return;
     }
 
@@ -128,13 +134,13 @@ const Shop = () => {
       if (response.ok) {
         setCoins((prev) => prev - item.price);
         setPurchasedItems((prev) => new Set(prev).add(item.uuid));
-        alert('Sikeres vásárlás!');
+        toast.success('Sikeres vásárlás!');
       } else {
-        alert(data.message || 'Hiba történt a vásárlás során');
+        toast.error(data.message || 'Hiba történt a vásárlás során');
       }
-    } catch (error) {
-      console.error('Error buying item:', error);
-      alert('Hálózati hiba történt');
+    } catch (err) {
+      console.error('Error buying item:', err);
+      toast.error('Hálózati hiba történt');
     }
   };
 

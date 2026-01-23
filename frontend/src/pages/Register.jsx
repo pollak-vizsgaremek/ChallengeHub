@@ -1,38 +1,39 @@
-import React, { useState, useEffect } from 'react'
-import AOS from 'aos'
-import 'aos/dist/aos.css'
-import './Register.css' // Using the specific CSS file for Register
-import { Link, useNavigate } from 'react-router-dom'
-import HCaptcha from '@hcaptcha/react-hcaptcha'
+import React, { useState, useEffect } from 'react';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+import './Register.css'; // Using the specific CSS file for Register
+import { Link, useNavigate } from 'react-router-dom';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
+import toast from 'react-hot-toast';
 
-import Navbar from '../components/navbar'
-import Footer from '../components/Footer'
+import Navbar from '../components/navbar';
+import Footer from '../components/Footer';
 
 const Register = () => {
-  const [username, setUsername] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [captchaToken, setCaptchaToken] = useState('')
-  const navigate = useNavigate()
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     AOS.init({
       once: true,
       mirror: false,
-    })
-  }, [])
+    });
+  }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!captchaToken) {
-      alert('Kérlek igazold, hogy nem vagy robot!')
-      return
+      toast.error('Kérlek igazold, hogy nem vagy robot!');
+      return;
     }
 
     if (password !== confirmPassword) {
-      alert('A jelszavak nem egyeznek!')
-      return
+      toast.error('A jelszavak nem egyeznek!');
+      return;
     }
 
     try {
@@ -51,21 +52,21 @@ const Register = () => {
             captchaToken,
           }),
         }
-      )
+      );
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (response.ok) {
-        alert('Sikeres regisztráció! Most már bejelentkezhetsz.')
-        navigate('/bejelentkezes')
+        toast.success('Sikeres regisztráció! Most már bejelentkezhetsz.');
+        navigate('/bejelentkezes');
       } else {
-        alert(data.message || 'Sikertelen regisztráció!')
+        toast.error(data.message || 'Sikertelen regisztráció!');
       }
-    } catch (error) {
-      console.error('Registration error:', error)
-      alert('Hálózati hiba történt!')
+    } catch (err) {
+      console.error('Registration error:', err);
+      toast.error('Hálózati hiba történt!');
     }
-  }
+  };
 
   return (
     <>
@@ -254,7 +255,7 @@ const Register = () => {
 
       <Footer />
     </>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;

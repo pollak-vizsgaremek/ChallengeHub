@@ -121,12 +121,14 @@ router.post('/bejelentkezes', async (req, res) => {
   const { username, password, captchaToken } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ message: 'Missing username or password' });
+    return res
+      .status(400)
+      .json({ message: 'Hiányzó felhasználónév vagy jelszó!' });
   }
 
   // Verify Captcha
   if (!captchaToken) {
-    return res.status(400).json({ message: 'Missing Captcha token' });
+    return res.status(400).json({ message: 'Hiányzó Captcha!' });
   }
 
   const isCaptchaValid = await verifyCaptcha(captchaToken);
@@ -139,12 +141,14 @@ router.post('/bejelentkezes', async (req, res) => {
     const data = await login(username, password);
 
     if (!data || data === -1) {
-      return res.status(401).json({ message: 'Invalid username or password' });
+      return res
+        .status(401)
+        .json({ message: 'Hibás felhasználónév vagy jelszó!' });
     }
     res.status(200).json(data);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error', err: error.message });
+    res.status(500).json({ message: 'Szerver hiba!', err: error.message });
   }
 });
 
@@ -221,13 +225,13 @@ router.post('/regisztracio', async (req, res) => {
 
   if (!username || !email || !password || !passwordConfirm) {
     return res.status(400).json({
-      message: 'Missing username, email, password or passwordConfirm',
+      message: 'Hiányzó felhasználónév, email, jelszó vagy jelszó megerősítés!',
     });
   }
 
   // Verify Captcha
   if (!captchaToken) {
-    return res.status(400).json({ message: 'Missing Captcha token' });
+    return res.status(400).json({ message: 'Hiányzó Captcha!' });
   }
 
   const isCaptchaValid = await verifyCaptcha(captchaToken);
@@ -238,7 +242,7 @@ router.post('/regisztracio', async (req, res) => {
   try {
     const userId = await register(username, email, password, passwordConfirm);
 
-    res.status(201).json({ message: 'Successfull registration!', userId });
+    res.status(201).json({ message: 'Sikeres regisztráció!', userId });
   } catch (error) {
     console.error(error);
     res.status(400).json({ message: error.message });

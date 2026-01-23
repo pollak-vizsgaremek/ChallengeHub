@@ -1,32 +1,33 @@
-import React, { useEffect, useState } from 'react'
-import AOS from 'aos'
-import 'aos/dist/aos.css'
-import './Login.css'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+import './Login.css';
+import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
-import Navbar from '../components/navbar'
-import Footer from '../components/Footer'
+import Navbar from '../components/navbar';
+import Footer from '../components/Footer';
 
-import HCaptcha from '@hcaptcha/react-hcaptcha'
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 const Login = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [captchaToken, setCaptchaToken] = useState('')
-  const navigate = useNavigate()
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     AOS.init({
       once: true,
       mirror: false,
-    })
-  }, [])
+    });
+  }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!captchaToken) {
-      alert('Kérlek igazold, hogy nem vagy robot!')
-      return
+      toast.error('Kérlek igazold, hogy nem vagy robot!');
+      return;
     }
 
     try {
@@ -43,14 +44,14 @@ const Login = () => {
             captchaToken,
           }),
         }
-      )
+      );
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (response.ok) {
         // Save token and user info
-        localStorage.setItem('accessToken', data.accessToken)
-        localStorage.setItem('refreshToken', data.refreshToken)
+        localStorage.setItem('accessToken', data.accessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
         localStorage.setItem(
           'user',
           JSON.stringify({
@@ -60,24 +61,24 @@ const Login = () => {
             isAdmin: data.isAdmin,
             onboardingCompleted: data.onboardingCompleted,
           })
-        )
+        );
 
         // Redirect based on onboarding status
         if (!data.onboardingCompleted) {
-          navigate('/kezdeti-lepesek')
+          navigate('/kezdeti-lepesek');
         } else {
-          navigate('/')
+          navigate('/');
         }
         // Force update of Navbar component
-        window.dispatchEvent(new Event('storage'))
+        window.dispatchEvent(new Event('storage'));
       } else {
-        alert(data.message || 'Sikertelen bejelentkezés!')
+        toast.error(data.message || 'Sikertelen bejelentkezés!');
       }
-    } catch (error) {
-      console.error('Login error:', error)
-      alert('Hálózati hiba történt!')
+    } catch (err) {
+      console.error('Login error:', err);
+      toast.error('Hálózati hiba történt!');
     }
-  }
+  };
 
   return (
     <>
@@ -210,7 +211,7 @@ const Login = () => {
 
       <Footer />
     </>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

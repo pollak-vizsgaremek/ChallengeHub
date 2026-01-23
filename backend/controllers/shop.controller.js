@@ -132,7 +132,9 @@ router.post('/buy', async (req, res) => {
   try {
     const { userId, itemId } = req.body;
     if (!userId || !itemId) {
-      return res.status(400).json({ message: 'Missing userId or itemId' });
+      return res
+        .status(400)
+        .json({ message: 'Hiányzó felhasználó vagy termék!' });
     }
     const result = await purchaseItem(userId, itemId);
     res.status(200).json(result);
@@ -211,13 +213,13 @@ router.get('/purchased', async (req, res) => {
   try {
     const { userId } = req.query;
     if (!userId) {
-      return res.status(400).json({ message: 'Missing userId' });
+      return res.status(400).json({ message: 'Hiányzó felhasználó!' });
     }
     const purchasedItems = await getUserPurchasedItems(userId);
     res.status(200).json(purchasedItems);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Szerver hiba!' });
   }
 });
 

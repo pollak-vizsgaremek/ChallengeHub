@@ -5,6 +5,17 @@ import './Profile.css';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
 import { useNavigate } from 'react-router-dom';
+import {
+  FaUser,
+  FaBullseye,
+  FaShoppingCart,
+  FaCoffee,
+  FaFire,
+  FaBolt,
+  FaCoins,
+  FaStar,
+  FaShoppingBag,
+} from 'react-icons/fa';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -27,9 +38,9 @@ const Profile = () => {
   const [success, setSuccess] = useState('');
 
   const activityLevels = [
-    { id: 'casual', name: 'Laza', icon: '☕' },
-    { id: 'active', name: 'Aktív', icon: '🔥' },
-    { id: 'hardcore', name: 'Megszállott', icon: '⚡' },
+    { id: 'casual', name: 'Laza', icon: <FaCoffee /> },
+    { id: 'active', name: 'Aktív', icon: <FaFire /> },
+    { id: 'hardcore', name: 'Megszállott', icon: <FaBolt /> },
   ];
 
   useEffect(() => {
@@ -309,17 +320,23 @@ const Profile = () => {
 
           <div className="profile-stats">
             <div className="stat-card">
-              <div className="stat-icon">🪙</div>
+              <div className="stat-icon">
+                <FaCoins />
+              </div>
               <div className="stat-value">{profile?.coin || 0}</div>
               <div className="stat-label">Coin</div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">⭐</div>
+              <div className="stat-icon">
+                <FaStar />
+              </div>
               <div className="stat-value">{profile?.xp || 0}</div>
               <div className="stat-label">XP</div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">🛒</div>
+              <div className="stat-icon">
+                <FaShoppingCart />
+              </div>
               <div className="stat-value">
                 {profile?.purchasedItems?.length || 0}
               </div>
@@ -336,7 +353,9 @@ const Profile = () => {
           {/* Account Settings */}
           <div className="profile-section">
             <div className="section-title">
-              <h2>👤 Fiók</h2>
+              <h2>
+                <FaUser /> Fiók
+              </h2>
             </div>
             <div className="section-content">
               <div className="profile-row">
@@ -491,7 +510,9 @@ const Profile = () => {
           {/* Interests */}
           <div className="profile-section">
             <div className="section-title">
-              <h2>🎯 Érdeklődés</h2>
+              <h2>
+                <FaBullseye /> Érdeklődés
+              </h2>
               {editMode !== 'interests' && (
                 <button
                   className="btn-edit-section"
@@ -513,7 +534,7 @@ const Profile = () => {
                           className={`activity-btn ${selectedActivityLevel === level.id ? 'active' : ''}`}
                           onClick={() => setSelectedActivityLevel(level.id)}
                         >
-                          <span>{level.icon}</span>
+                          {level.icon}
                           <span>{level.name}</span>
                         </button>
                       ))}
@@ -584,7 +605,9 @@ const Profile = () => {
           {/* Purchased Items */}
           <div className="profile-section full-width">
             <div className="section-title">
-              <h2>🛒 Termékeim</h2>
+              <h2>
+                <FaShoppingCart /> Termékeim
+              </h2>
             </div>
             <div className="section-content">
               {profile?.purchasedItems?.length > 0 ? (
@@ -606,7 +629,9 @@ const Profile = () => {
                     className="btn-shop"
                     onClick={() => navigate('/bolt')}
                   >
-                    Irány a bolt! 🛍️
+                    <span className="btn-shop-inner">
+                      Irány a bolt! <FaShoppingBag />
+                    </span>
                   </button>
                 </div>
               )}

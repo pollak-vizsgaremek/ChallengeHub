@@ -57,7 +57,7 @@ router.get('/', async (req, res) => {
     res.status(200).json(challenges);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Szerver hiba!' });
   }
 });
 
@@ -131,7 +131,7 @@ router.get('/daily', async (req, res) => {
   const { userId, type } = req.query;
 
   if (!userId) {
-    return res.status(400).json({ message: 'Missing userId' });
+    return res.status(400).json({ message: 'Hiányzó felhasználó!' });
   }
 
   try {
@@ -139,7 +139,7 @@ router.get('/daily', async (req, res) => {
     res.status(200).json(challenges);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Szerver hiba!' });
   }
 });
 

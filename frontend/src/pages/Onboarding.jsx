@@ -5,6 +5,7 @@ import './Onboarding.css';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
+import toast from 'react-hot-toast';
 
 const Onboarding = () => {
   const [categories, setCategories] = useState([]);
@@ -100,11 +101,11 @@ const Onboarding = () => {
       if (response.ok) {
         navigate('/');
       } else {
-        alert('Hiba történt a mentés során!');
+        toast.error('Hiba történt a mentés során!');
       }
-    } catch (error) {
-      console.error('Save error:', error);
-      alert('Hálózati hiba!');
+    } catch (err) {
+      console.error('Save error:', err);
+      toast.error('Hálózati hiba!');
     }
   };
 

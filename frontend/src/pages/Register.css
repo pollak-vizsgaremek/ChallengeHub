@@ -19,7 +19,9 @@
   box-shadow: var(--shadow-lg);
   position: relative;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .register-card:hover {

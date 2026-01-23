@@ -50,7 +50,7 @@ export const login = async (username, password) => {
 // Register
 export const register = async (username, email, password, passwordConfirm) => {
   if (password !== passwordConfirm) {
-    throw new Error('Passwords do not match!');
+    throw new Error('A jelszavak nem egyeznek!');
   }
 
   // Check if user exists
@@ -61,7 +61,7 @@ export const register = async (username, email, password, passwordConfirm) => {
   });
 
   if (existingUser) {
-    throw new Error('Username or email already exists!');
+    throw new Error('A felhasználónév vagy email már foglalt!');
   }
 
   const encryptedPassword = bcrypt.hashSync(password, 12);
@@ -97,7 +97,8 @@ export const register = async (username, email, password, passwordConfirm) => {
 
   // Add default endpoint access permissions
   const defaultEndpoints = [
-    { endpoint: '/api/v1/users', methods: 'POST,GET' },
+    { endpoint: '/api/v1/users', methods: 'POST,GET,PUT' },
+    { endpoint: '/api/v1/users/stats', methods: 'GET' },
     { endpoint: '/api/v1/categories', methods: 'POST,GET' },
     { endpoint: '/api/v1/shop', methods: 'POST,GET' },
   ];
