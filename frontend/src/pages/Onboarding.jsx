@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react'
-import AOS from 'aos'
-import 'aos/dist/aos.css'
-import './Onboarding.css'
-import { useNavigate } from 'react-router-dom'
-import Navbar from '../components/navbar'
-import Footer from '../components/Footer'
+import React, { useState, useEffect } from 'react';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+import './Onboarding.css';
+import { useNavigate } from 'react-router-dom';
+import Navbar from '../components/navbar';
+import Footer from '../components/Footer';
 
 const Onboarding = () => {
-  const [categories, setCategories] = useState([])
-  const [selectedCategories, setSelectedCategories] = useState([])
-  const navigate = useNavigate()
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const navigate = useNavigate();
 
-  const [step, setStep] = useState(1)
-  const [activityLevel, setActivityLevel] = useState(null)
+  const [step, setStep] = useState(1);
+  const [activityLevel, setActivityLevel] = useState(null);
 
   const activityLevels = [
     {
@@ -36,44 +36,49 @@ const Onboarding = () => {
       icon: '⚡',
       color: '#ff4757',
     },
-  ]
+  ];
 
   useEffect(() => {
-    AOS.init({ once: true })
-    fetchCategories()
-  }, [])
+    AOS.init({ once: true });
+    fetchCategories();
+  }, []);
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:3300/api/v1/categories')
+      const response = await fetch('http://localhost:3300/api/v1/categories', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
       if (response.ok) {
-        const data = await response.json()
-        setCategories(data)
+        const data = await response.json();
+        setCategories(data);
       }
     } catch (error) {
-      console.error('Error fetching categories:', error)
+      console.error('Error fetching categories:', error);
     }
-  }
+  };
 
   const toggleCategory = (categoryId) => {
     setSelectedCategories((prev) => {
       if (prev.includes(categoryId)) {
-        return prev.filter((id) => id !== categoryId)
+        return prev.filter((id) => id !== categoryId);
       } else {
-        return [...prev, categoryId]
+        return [...prev, categoryId];
       }
-    })
-  }
+    });
+  };
 
   const handleNextStep = () => {
-    setStep(2)
-  }
+    setStep(2);
+  };
 
   const handleFinish = async () => {
-    const userStr = localStorage.getItem('user')
-    if (!userStr) return
+    const userStr = localStorage.getItem('user');
+    if (!userStr) return;
 
-    const user = JSON.parse(userStr)
+    const user = JSON.parse(userStr);
 
     try {
       const response = await fetch(
@@ -82,6 +87,7 @@ const Onboarding = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
           body: JSON.stringify({
             userId: user.userId,
@@ -89,18 +95,18 @@ const Onboarding = () => {
             activityLevel: activityLevel,
           }),
         }
-      )
+      );
 
       if (response.ok) {
-        navigate('/')
+        navigate('/');
       } else {
-        alert('Hiba történt a mentés során!')
+        alert('Hiba történt a mentés során!');
       }
     } catch (error) {
-      console.error('Save error:', error)
-      alert('Hálózati hiba!')
+      console.error('Save error:', error);
+      alert('Hálózati hiba!');
     }
-  }
+  };
 
   return (
     <>
@@ -133,9 +139,9 @@ const Onboarding = () => {
                     'movement',
                     'aktív',
                     'aktiv',
-                  ].includes(category.type?.toLowerCase() || '')
-                  const typeLabel = isSport ? 'Aktív' : 'Egyéni'
-                  const typeClass = isSport ? 'tag-active' : 'tag-custom'
+                  ].includes(category.type?.toLowerCase() || '');
+                  const typeLabel = isSport ? 'Aktív' : 'Egyéni';
+                  const typeClass = isSport ? 'tag-active' : 'tag-custom';
 
                   return (
                     <div
@@ -171,7 +177,7 @@ const Onboarding = () => {
                       <div className="category-icon">🎯</div>
                       <div className="category-name">{category.name}</div>
                     </div>
-                  )
+                  );
                 })}
               </div>
 
@@ -242,7 +248,7 @@ const Onboarding = () => {
 
       <Footer />
     </>
-  )
-}
+  );
+};
 
-export default Onboarding
+export default Onboarding;

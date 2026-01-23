@@ -95,5 +95,25 @@ export const register = async (username, email, password, passwordConfirm) => {
     },
   });
 
+  // Add default endpoint access permissions
+  const defaultEndpoints = [
+    { endpoint: '/api/v1/users', methods: 'POST,GET' },
+    { endpoint: '/api/v1/categories', methods: 'POST,GET' },
+    { endpoint: '/api/v1/shop', methods: 'POST,GET' },
+  ];
+
+  await Promise.all(
+    defaultEndpoints.map((ep) =>
+      prisma.user_endpoint_access.create({
+        data: {
+          uuid: crypto.randomUUID(),
+          endpoint: ep.endpoint,
+          methods: ep.methods,
+          user_id: newUser.uuid,
+        },
+      })
+    )
+  );
+
   return newUser.uuid;
 };

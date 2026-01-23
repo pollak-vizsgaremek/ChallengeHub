@@ -10,6 +10,7 @@ const ShopPage = lazy(() => import('./pages/Shop'));
 const LoginPage = lazy(() => import('./pages/Login'));
 const RegisterPage = lazy(() => import('./pages/Register'));
 const OnboardingPage = lazy(() => import('./pages/Onboarding'));
+const ProfilePage = lazy(() => import('./pages/Profile'));
 import Music from './components/Music';
 import ProtectedRoute from './guards/ProtectedRoute';
 
@@ -34,6 +35,7 @@ createRoot(document.getElementById('root')).render(
               element={<CustomChallengesPage />}
             />
             <Route path="/kezdeti-lepesek" element={<OnboardingPage />} />
+            <Route path="/profil" element={<ProfilePage />} />
           </Route>
           <Route path="/bolt" element={<ShopPage />} />
           <Route path="/bejelentkezes" element={<LoginPage />} />
