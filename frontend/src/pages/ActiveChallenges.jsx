@@ -218,7 +218,6 @@ const ActiveChallenges = () => {
         </div>
       </div>
 
-
       <InterestsCTA />
       <Footer />
     </>

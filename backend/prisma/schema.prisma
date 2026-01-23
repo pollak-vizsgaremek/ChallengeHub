@@ -21,7 +21,7 @@ model categories {
   tasks                              tasks[]
 
   @@index([created_by, updated_by], map: "created_by")
-  @@index([updated_by], map: "updated_by")
+  @@index([updated_by], map: "categories_ibfk_2")
 }
 
 model reviews {
@@ -35,7 +35,7 @@ model reviews {
   tasks      tasks    @relation(fields: [task_id], references: [uuid], onUpdate: Restrict, map: "reviews_ibfk_2")
 
   @@index([task_id, user_id], map: "task_id")
-  @@index([user_id], map: "user_id")
+  @@index([user_id], map: "reviews_ibfk_1")
 }
 
 model tasks {
@@ -57,7 +57,7 @@ model tasks {
 
   @@index([categories_id], map: "categories_id")
   @@index([created_by, updated_by], map: "created_by")
-  @@index([updated_by], map: "updated_by")
+  @@index([updated_by], map: "tasks_ibfk_2")
 }
 
 model user_group {
@@ -92,41 +92,67 @@ model user_tasks {
   tasks        tasks     @relation(fields: [task_id], references: [uuid], onUpdate: Restrict, map: "user_tasks_ibfk_2")
 
   @@index([task_id, user_id], map: "task_id")
-  @@index([user_id], map: "user_id")
+  @@index([user_id], map: "user_tasks_ibfk_1")
 }
 
 model users {
-  uuid                                    String       @id @default(uuid()) @db.VarChar(36)
-  username                                String       @db.VarChar(128)
-  email                                   String       @unique(map: "email") @db.VarChar(255)
-  password                                String       @db.VarChar(255)
+  uuid                                    String                 @id @default(uuid()) @db.VarChar(36)
+  username                                String                 @db.VarChar(128)
+  email                                   String                 @unique(map: "email") @db.VarChar(255)
+  password                                String                 @db.VarChar(255)
   xp                                      Int
   coin                                    Int
-  group_id                                String       @db.VarChar(36)
-  registered_at                           DateTime     @default(now()) @db.DateTime(0)
-  onboarding_completed                    Boolean      @default(false)
-  activity_level                          String?      @db.VarChar(20)
-  current_streak                          Int          @default(0)
-  longest_streak                          Int          @default(0)
-  last_completed_at                       DateTime?    @db.DateTime(0)
-  categories_categories_created_byTousers categories[] @relation("categories_created_byTousers")
-  categories_categories_updated_byTousers categories[] @relation("categories_updated_byTousers")
+  group_id                                String                 @db.VarChar(36)
+  registered_at                           DateTime               @default(now()) @db.DateTime(0)
+  onboarding_completed                    Boolean                @default(false)
+  activity_level                          String?                @db.VarChar(20)
+  current_streak                          Int                    @default(0)
+  last_completed_at                       DateTime?              @db.DateTime(0)
+  longest_streak                          Int                    @default(0)
+  categories_categories_created_byTousers categories[]           @relation("categories_created_byTousers")
+  categories_categories_updated_byTousers categories[]           @relation("categories_updated_byTousers")
   reviews                                 reviews[]
-  tasks_tasks_created_byTousers           tasks[]      @relation("tasks_created_byTousers")
-  tasks_tasks_updated_byTousers           tasks[]      @relation("tasks_updated_byTousers")
+  tasks_tasks_created_byTousers           tasks[]                @relation("tasks_created_byTousers")
+  tasks_tasks_updated_byTousers           tasks[]                @relation("tasks_updated_byTousers")
+  user_endpoint_access                    user_endpoint_access[]
+  user_shop_items                         user_shop_items[]
   user_tasks                              user_tasks[]
-  user_group                              user_group   @relation(fields: [group_id], references: [uuid], onUpdate: Restrict, map: "users_ibfk_1")
+  user_group                              user_group             @relation(fields: [group_id], references: [uuid], onUpdate: Restrict, map: "users_ibfk_1")
 
   @@index([group_id], map: "group_id")
 }
 
 model shop_items {
-  uuid        String   @id @default(uuid()) @db.VarChar(36)
-  name        String   @db.VarChar(128)
-  description String   @db.Text
-  price       Int
-  category    String   @db.VarChar(50)
-  image   String   @db.VarChar(255)
-  value       String?  @db.VarChar(255)
-  created_at  DateTime @default(now()) @db.DateTime(0)
+  uuid            String            @id @default(uuid()) @db.VarChar(36)
+  name            String            @db.VarChar(128)
+  description     String            @db.Text
+  price           Int
+  category        String            @db.VarChar(50)
+  created_at      DateTime          @default(now()) @db.DateTime(0)
+  image           String            @db.VarChar(255)
+  value           String?           @db.VarChar(255)
+  user_shop_items user_shop_items[]
+}
+
+model user_shop_items {
+  uuid         String     @id @default(uuid()) @db.VarChar(36)
+  user_id      String     @db.VarChar(36)
+  shop_item_id String     @db.VarChar(36)
+  purchased_at DateTime   @default(now()) @db.DateTime(0)
+  users        users      @relation(fields: [user_id], references: [uuid], onUpdate: Restrict, map: "user_shop_items_ibfk_1")
+  shop_items   shop_items @relation(fields: [shop_item_id], references: [uuid], onUpdate: Restrict, map: "user_shop_items_ibfk_2")
+
+  @@unique([user_id, shop_item_id], map: "user_shop_uniq")
+  @@index([shop_item_id], map: "shop_item_id")
+  @@index([user_id], map: "user_id")
+}
+
+model user_endpoint_access {
+  uuid     String @id @db.VarChar(36)
+  endpoint String @db.VarChar(100)
+  methods  String @db.Text
+  user_id  String @db.VarChar(36)
+  users    users  @relation(fields: [user_id], references: [uuid], onUpdate: Restrict, map: "user_endpoint_access_ibfk_1")
+
+  @@index([user_id], map: "user_id")
 }

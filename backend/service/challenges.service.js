@@ -2,6 +2,7 @@ import { PrismaClient } from '../generated/prisma/client.js'
 
 const prisma = new PrismaClient()
 
+// Get all challenges
 export const getAllChallenges = async () => {
   return await prisma.tasks.findMany({
     include: {
@@ -15,8 +16,9 @@ export const getAllChallenges = async () => {
   })
 }
 
+// Get daily challenges
 export const getDailyChallenges = async (userId, type) => {
-  // 1. Get user details
+  // Get user details
   const user = await prisma.users.findUnique({
     where: { uuid: userId },
   })
@@ -27,17 +29,18 @@ export const getDailyChallenges = async (userId, type) => {
     where: { user_id: userId },
   })
 
-  // 2. Determine daily limit based on activity level
+  // Determine daily limit based on activity level
   let limit = 3 // Default 'active'
   if (user.activity_level === 'casual') limit = 3
   if (user.activity_level === 'hardcore') limit = 5
 
-  // 3. Check for existing daily challenges
+  // Check for existing daily challenges
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
 
+  // Check for existing daily challenges
   const existingTasks = await prisma.user_tasks.findMany({
     where: {
       user_id: userId,
@@ -53,6 +56,7 @@ export const getDailyChallenges = async (userId, type) => {
     },
   })
 
+  // Return existing challenges if any
   if (existingTasks.length > 0) {
     if (type) {
       const activeTypes = [
@@ -74,25 +78,17 @@ export const getDailyChallenges = async (userId, type) => {
     return existingTasks.map((ut) => ut.tasks)
   }
 
-  // 4. Generate new challenges if none exist
+  // Generate new challenges if none exist
 
   const interestIds = userInterests.map((ui) => ui.category_id)
 
+  // Get all tasks based on interests
   const allTasks = await prisma.tasks.findMany({
     where: {
       categories_id: { in: interestIds.length > 0 ? interestIds : undefined },
     },
     include: { categories: true },
   })
-
-  console.log('DEBUG: Found tasks count:', allTasks.length)
-  if (allTasks.length > 0) {
-    console.log('DEBUG: First task category:', allTasks[0].categories)
-    console.log(
-      'DEBUG: All categories types:',
-      allTasks.map((t) => t.categories?.type)
-    )
-  }
 
   // Split into active/custom pools
   const activeTypes = [
@@ -104,6 +100,7 @@ export const getDailyChallenges = async (userId, type) => {
     'aktiv',
   ]
 
+  // Split into active/custom pools
   const activePool = allTasks.filter((t) =>
     activeTypes.includes(t.categories?.type?.toLowerCase() || '')
   )
@@ -120,14 +117,12 @@ export const getDailyChallenges = async (userId, type) => {
     return shuffled.slice(0, count)
   }
 
-  // 4a. Fetch all specific tasks by type if interest-based pool is too small?
-
   const dailyActive = pickRandom(activePool, limit)
   const dailyCustom = pickRandom(customPool, limit)
 
   const tasksToAssign = [...new Set([...dailyActive, ...dailyCustom])]
 
-  // 5. Save to user_tasks
+  // Save to user_tasks
   const operations = tasksToAssign.map((task) =>
     prisma.user_tasks.create({
       data: {
@@ -141,7 +136,7 @@ export const getDailyChallenges = async (userId, type) => {
 
   await prisma.$transaction(operations)
 
-  // 6. Return filtered
+  // Return filtered
   const finalPool = tasksToAssign
   if (type) {
     const activeTypes = [

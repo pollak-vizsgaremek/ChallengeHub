@@ -45,3 +45,90 @@
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 20px rgba(165, 180, 252, 0.3);
 }
+
+/* Hamburger Menu */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 20;
+}
+
+.hamburger-line {
+  width: 30px;
+  height: 3px;
+  background-color: var(--text-white);
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem 1.5rem;
+    position: relative;
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
+
+  .nav-actions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    flex-direction: column;
+    background: rgba(19, 15, 64, 0.98);
+    backdrop-filter: blur(20px);
+    padding: 2rem;
+    gap: 1.5rem;
+    transform: translateY(-20px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    z-index: -1;
+  }
+
+  .nav-actions.open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Animate Hamburger */
+  .menu-toggle.open .hamburger-line:nth-child(1) {
+    transform: rotate(45deg) translate(6px, 6px);
+  }
+  .menu-toggle.open .hamburger-line:nth-child(2) {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  .menu-toggle.open .hamburger-line:nth-child(3) {
+    transform: rotate(-45deg) translate(6px, -6px);
+  }
+
+  /* Mobile Button adjustments */
+  .btn-shop,
+  .btn-login,
+  .btn-logout {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    height: 70px;
+  }
+
+  .navbar-user {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+  }
+}

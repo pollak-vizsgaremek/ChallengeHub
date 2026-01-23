@@ -1,54 +1,69 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import './Navbar.css'
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import './Navbar.css';
 
 const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [username, setUsername] = useState('')
-  const navigate = useNavigate()
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkLogin = () => {
-      const userStr = localStorage.getItem('user')
+      const userStr = localStorage.getItem('user');
       if (userStr) {
-        setIsLoggedIn(true)
+        setIsLoggedIn(true);
         try {
-          const user = JSON.parse(userStr)
-          setUsername(user.username || 'Felhasználó')
+          const user = JSON.parse(userStr);
+          setUsername(user.username || 'Felhasználó');
         } catch (error) {
-          console.error('Hibás user adat', error)
-          setIsLoggedIn(false)
+          console.error('Hibás user adat', error);
+          setIsLoggedIn(false);
         }
       } else {
-        setIsLoggedIn(false)
-        setUsername('')
+        setIsLoggedIn(false);
+        setUsername('');
       }
-    }
+    };
 
-    checkLogin()
-    window.addEventListener('storage', checkLogin)
+    checkLogin();
+    window.addEventListener('storage', checkLogin);
 
     return () => {
-      window.removeEventListener('storage', checkLogin)
-    }
-  }, [])
+      window.removeEventListener('storage', checkLogin);
+    };
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
-    localStorage.removeItem('user')
-    setIsLoggedIn(false)
-    navigate('/')
-    window.location.reload()
-  }
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    setIsLoggedIn(false);
+    navigate('/');
+    window.location.reload();
+  };
 
   return (
     <nav className="navbar" data-aos="fade-down" data-aos-duration="1000">
       <Link to="/" className="logo">
         CHB
       </Link>
-      <div className="nav-actions">
-        <Link to="/bolt" className="btn btn-shop">
+      <button
+        className={`menu-toggle ${menuOpen ? 'open' : ''}`}
+        onClick={() => setMenuOpen(!menuOpen)}
+        aria-label="Toggle navigation"
+      >
+        <div className="hamburger-line"></div>
+        <div className="hamburger-line"></div>
+        <div className="hamburger-line"></div>
+      </button>
+
+      <div className={`nav-actions ${menuOpen ? 'open' : ''}`}>
+        <Link
+          to="/bolt"
+          className="btn btn-shop"
+          onClick={() => setMenuOpen(false)}
+        >
           <svg
             width="24"
             height="24"
@@ -68,7 +83,9 @@ const Navbar = () => {
         {isLoggedIn ? (
           <>
             <div className="navbar-user">
-              <span className="navbar-username">{username}</span>
+              <Link to="/profil" className="navbar-username">
+                {username}
+              </Link>
             </div>
             <button onClick={handleLogout} className="btn btn-logout">
               <div className="logout-icon-container">
@@ -93,7 +110,11 @@ const Navbar = () => {
             </button>
           </>
         ) : (
-          <Link to="/bejelentkezes" className="btn btn-login">
+          <Link
+            to="/bejelentkezes"
+            className="btn btn-login"
+            onClick={() => setMenuOpen(false)}
+          >
             <div className="login-icon-container">
               <svg
                 width="24"
@@ -117,7 +138,7 @@ const Navbar = () => {
         )}
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

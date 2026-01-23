@@ -15,7 +15,22 @@ const Music = () => {
 
     if (audioRef.current) {
       audioRef.current.volume = 0
-      audioRef.current.play().catch((e) => console.log('Autoplay blocked:', e))
+    }
+
+    // Function to handle the first interaction
+    const handleFirstInteraction = () => {
+      if (audioRef.current) {
+        audioRef.current
+          .play()
+          .catch((e) => console.log('Autoplay still blocked or failed:', e))
+      }
+      document.removeEventListener('click', handleFirstInteraction)
+    }
+
+    document.addEventListener('click', handleFirstInteraction)
+
+    return () => {
+      document.removeEventListener('click', handleFirstInteraction)
     }
   }, [])
 

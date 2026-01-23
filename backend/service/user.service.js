@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 const prisma = new PrismaClient()
 
+// Save user interests
 export const saveUserInterests = async (userId, categoryIds, activityLevel) => {
   const operations = categoryIds.map((catId) =>
     prisma.user_interests.create({
@@ -14,6 +15,7 @@ export const saveUserInterests = async (userId, categoryIds, activityLevel) => {
     })
   )
 
+  // Update user onboarding status
   operations.push(
     prisma.users.update({
       where: { uuid: userId },
@@ -28,6 +30,7 @@ export const saveUserInterests = async (userId, categoryIds, activityLevel) => {
   return true
 }
 
+// Update user streak
 export const updateStreak = async (userId) => {
   const user = await prisma.users.findUnique({
     where: { uuid: userId },
@@ -81,6 +84,7 @@ export const updateStreak = async (userId) => {
   return newStreak
 }
 
+// Get user stats
 export const getUserStats = async (userId) => {
   const user = await prisma.users.findUnique({
     where: { uuid: userId },
@@ -92,7 +96,6 @@ export const getUserStats = async (userId) => {
   })
 
   if (!user) {
-    //! Egyenlőre így lesz megoldva
     throw new Error('User not found')
   }
 
@@ -119,6 +122,7 @@ export const getUserStats = async (userId) => {
   }
 }
 
+// Get user balance
 export const getUserBalance = async (userId) => {
   const user = await prisma.users.findUnique({
     where: { uuid: userId },
@@ -127,7 +131,6 @@ export const getUserBalance = async (userId) => {
     },
   })
 
-  // ! Itt is egyenlőre csak így dobom a hibát.
   if (!user) {
     throw new Error('User not found')
   }
