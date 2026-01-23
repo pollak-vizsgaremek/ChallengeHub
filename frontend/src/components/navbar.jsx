@@ -1,12 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
+import '../styles/shopItems.css';
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeItems, setActiveItems] = useState({
+    border: null,
+    nameColor: null,
+  });
   const navigate = useNavigate();
+
+  // Fetch active items
+  const fetchActiveItems = async (userId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3300/api/v1/shop/active?userId=${userId}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setActiveItems({
+          border: data.border,
+          nameColor: data.nameColor,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching active items:', error);
+    }
+  };
 
   useEffect(() => {
     const checkLogin = () => {
@@ -16,6 +45,7 @@ const Navbar = () => {
         try {
           const user = JSON.parse(userStr);
           setUsername(user.username || 'Felhasználó');
+          fetchActiveItems(user.userId);
         } catch (error) {
           console.error('Hibás user adat', error);
           setIsLoggedIn(false);
@@ -23,14 +53,26 @@ const Navbar = () => {
       } else {
         setIsLoggedIn(false);
         setUsername('');
+        setActiveItems({ border: null, nameColor: null });
       }
     };
 
     checkLogin();
     window.addEventListener('storage', checkLogin);
 
+    // Listen for active items update event
+    const handleActiveItemsUpdate = () => {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        fetchActiveItems(user.userId);
+      }
+    };
+    window.addEventListener('activeItemsUpdated', handleActiveItemsUpdate);
+
     return () => {
       window.removeEventListener('storage', checkLogin);
+      window.removeEventListener('activeItemsUpdated', handleActiveItemsUpdate);
     };
   }, []);
 
@@ -59,36 +101,49 @@ const Navbar = () => {
       </button>
 
       <div className={`nav-actions ${menuOpen ? 'open' : ''}`}>
-        {isLoggedIn && (
-          <Link
-            to="/bolt"
-            className="btn btn-shop"
-            onClick={() => setMenuOpen(false)}
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
-            <span className="btn-label">ÜZLET</span>
-          </Link>
-        )}
         {isLoggedIn ? (
           <>
             <div className="navbar-user">
-              <Link to="/profil" className="navbar-username">
+              <div
+                className={`navbar-avatar-frame ${activeItems.border?.value || 'default-border'}`}
+              >
+                <div className="navbar-avatar-placeholder">
+                  {username
+                    .split(' ')
+                    .map((word) => word.charAt(0))
+                    .slice(0, 2)
+                    .join('')
+                    .toUpperCase()}
+                </div>
+              </div>
+              <Link
+                to="/profil"
+                className={`navbar-username ${activeItems.nameColor?.value || 'default-name-color'}`}
+              >
                 {username}
               </Link>
             </div>
+            <Link
+              to="/bolt"
+              className="btn btn-shop"
+              onClick={() => setMenuOpen(false)}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+              <span className="btn-label">ÜZLET</span>
+            </Link>
             <button onClick={handleLogout} className="btn btn-logout">
               <div className="logout-icon-container">
                 <svg

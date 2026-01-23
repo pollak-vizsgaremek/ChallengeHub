@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import './Profile.css';
+import '../styles/shopItems.css';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import {
   FaUser,
   FaBullseye,
@@ -12,9 +14,11 @@ import {
   FaCoffee,
   FaFire,
   FaBolt,
-  FaCoins,
   FaStar,
   FaShoppingBag,
+  FaCheck,
+  FaImage,
+  FaTag,
 } from 'react-icons/fa';
 
 const Profile = () => {
@@ -36,6 +40,10 @@ const Profile = () => {
   const [selectedActivityLevel, setSelectedActivityLevel] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [activeItems, setActiveItems] = useState({
+    border: null,
+    nameColor: null,
+  });
 
   const activityLevels = [
     { id: 'casual', name: 'Laza', icon: <FaCoffee /> },
@@ -52,10 +60,129 @@ const Profile = () => {
       setUser(parsedUser);
       fetchProfile(parsedUser.userId);
       fetchCategories();
+      fetchActiveItems(parsedUser.userId);
     } else {
       navigate('/bejelentkezes');
     }
   }, [navigate]);
+
+  const fetchActiveItems = async (userId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3300/api/v1/shop/active?userId=${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setActiveItems(data);
+      }
+    } catch (error) {
+      console.error('Error fetching active items:', error);
+    }
+  };
+
+  const handleSetActiveItem = async (itemId, type) => {
+    try {
+      const response = await fetch('http://localhost:3300/api/v1/shop/active', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: JSON.stringify({
+          userId: user.userId,
+          itemId,
+          type,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success('Stílus sikeresen beállítva!');
+        fetchActiveItems(user.userId);
+        // Notify navbar about the change
+        window.dispatchEvent(new Event('activeItemsUpdated'));
+      } else {
+        const data = await response.json();
+        toast.error(data.message || 'Hiba történt!');
+      }
+    } catch (error) {
+      console.error('Error setting active item:', error);
+      toast.error('Hálózati hiba!');
+    }
+  };
+
+  const handleRemoveActiveItem = async (type) => {
+    try {
+      const response = await fetch('http://localhost:3300/api/v1/shop/active', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: JSON.stringify({
+          userId: user.userId,
+          type,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success('Stílus eltávolítva!');
+        // Notify navbar about the change
+        window.dispatchEvent(new Event('activeItemsUpdated'));
+        fetchActiveItems(user.userId);
+      } else {
+        const data = await response.json();
+        toast.error(data.message || 'Hiba történt!');
+      }
+    } catch (error) {
+      console.error('Error removing active item:', error);
+      toast.error('Hálózati hiba!');
+    }
+  };
+
+  const handleSellItem = async (item) => {
+    const sellPrice = Math.floor(item.price * 0.65);
+    if (
+      !window.confirm(
+        `Biztosan eladod "${item.name}" terméket ${sellPrice} 🪙 coinért? (Eredeti ár: ${item.price})`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3300/api/v1/shop/sell', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: JSON.stringify({
+          userId: user.userId,
+          itemId: item.uuid,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        toast.success(`Eladva! +${data.refund} 🪙`);
+        // Refresh profile and active items
+        fetchProfile(user.userId);
+        fetchActiveItems(user.userId);
+        window.dispatchEvent(new Event('activeItemsUpdated'));
+      } else {
+        const data = await response.json();
+        toast.error(data.message || 'Hiba történt!');
+      }
+    } catch (error) {
+      console.error('Error selling item:', error);
+      toast.error('Hálózati hiba!');
+    }
+  };
 
   const fetchProfile = async (userId) => {
     try {
@@ -309,20 +436,22 @@ const Profile = () => {
         {/* Top Row - Header + Stats */}
         <div className="profile-top-row">
           <div className="profile-header-card">
-            <div className="profile-avatar">
+            <div
+              className={`profile-avatar ${activeItems.border?.value || ''}`}
+            >
               {profile?.username?.charAt(0) || '?'}
             </div>
             <div className="profile-header-info">
-              <h1>{profile?.username}</h1>
+              <h1 className={activeItems.nameColor?.value || ''}>
+                {profile?.username}
+              </h1>
               <p>{profile?.email}</p>
             </div>
           </div>
 
           <div className="profile-stats">
             <div className="stat-card">
-              <div className="stat-icon">
-                <FaCoins />
-              </div>
+              <div className="stat-icon">🪙</div>
               <div className="stat-value">{profile?.coin || 0}</div>
               <div className="stat-label">Coin</div>
             </div>
@@ -612,15 +741,87 @@ const Profile = () => {
             <div className="section-content">
               {profile?.purchasedItems?.length > 0 ? (
                 <div className="purchased-grid">
-                  {profile.purchasedItems.map((item) => (
-                    <div key={item.uuid} className="purchased-card">
-                      <img src={item.image} alt={item.name} />
-                      <div className="purchased-card-info">
-                        <h4>{item.name}</h4>
-                        <span>{item.category}</span>
+                  {profile.purchasedItems.map((item) => {
+                    const isActiveBorder =
+                      activeItems.border?.uuid === item.uuid;
+                    const isActiveNameColor =
+                      activeItems.nameColor?.uuid === item.uuid;
+                    const isActive = isActiveBorder || isActiveNameColor;
+
+                    return (
+                      <div
+                        key={item.uuid}
+                        className={`purchased-card ${isActive ? 'active-item' : ''}`}
+                      >
+                        {isActive && (
+                          <div className="active-badge">
+                            <FaCheck /> Aktív
+                          </div>
+                        )}
+                        <div className="purchased-card-preview">
+                          {item.category === 'border' ? (
+                            <div className={`preview-avatar ${item.value}`}>
+                              <span className="preview-initial">
+                                {profile?.username?.charAt(0).toUpperCase() ||
+                                  'U'}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className={`preview-username ${item.value}`}>
+                              {profile?.username || 'Felhasználó'}
+                            </span>
+                          )}
+                        </div>
+                        <div className="purchased-card-info">
+                          <h4
+                            className={
+                              item.category === 'name' ? item.value : ''
+                            }
+                          >
+                            {item.name}
+                          </h4>
+                          <span className="item-category-badge">
+                            {item.category === 'border' ? (
+                              <>
+                                <FaImage /> Keret
+                              </>
+                            ) : (
+                              <>
+                                <FaTag /> Név szín
+                              </>
+                            )}
+                          </span>
+                        </div>
+                        <div className="purchased-card-actions">
+                          {isActive ? (
+                            <button
+                              className="btn-deactivate"
+                              onClick={() =>
+                                handleRemoveActiveItem(item.category)
+                              }
+                            >
+                              Eltávolítás
+                            </button>
+                          ) : (
+                            <button
+                              className="btn-activate"
+                              onClick={() =>
+                                handleSetActiveItem(item.uuid, item.category)
+                              }
+                            >
+                              Használat
+                            </button>
+                          )}
+                          <button
+                            className="btn-sell"
+                            onClick={() => handleSellItem(item)}
+                          >
+                            Eladás ({Math.floor(item.price * 0.65)} 🪙)
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="empty-state">

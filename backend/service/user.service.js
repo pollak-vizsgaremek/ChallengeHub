@@ -274,7 +274,7 @@ export const getUserPurchasedItemsWithDetails = async (userId) => {
     name: p.shop_items.name,
     description: p.shop_items.description,
     category: p.shop_items.category,
-    image: p.shop_items.image,
+    price: p.shop_items.price,
     value: p.shop_items.value,
     purchased_at: p.purchased_at,
   }));

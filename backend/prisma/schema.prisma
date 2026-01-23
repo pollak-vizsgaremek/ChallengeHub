@@ -109,6 +109,8 @@ model users {
   current_streak                          Int                    @default(0)
   last_completed_at                       DateTime?              @db.DateTime(0)
   longest_streak                          Int                    @default(0)
+  active_border_id                        String?                @db.VarChar(36)
+  active_name_color_id                    String?                @db.VarChar(36)
   categories_categories_created_byTousers categories[]           @relation("categories_created_byTousers")
   categories_categories_updated_byTousers categories[]           @relation("categories_updated_byTousers")
   reviews                                 reviews[]
@@ -129,7 +131,6 @@ model shop_items {
   price           Int
   category        String            @db.VarChar(50)
   created_at      DateTime          @default(now()) @db.DateTime(0)
-  image           String            @db.VarChar(255)
   value           String?           @db.VarChar(255)
   user_shop_items user_shop_items[]
 }

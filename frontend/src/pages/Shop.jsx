@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import './Shop.css';
+import '../styles/shopItems.css';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
 import toast from 'react-hot-toast';
@@ -212,6 +213,11 @@ const Shop = () => {
                 item
               );
             }
+
+            // Determine if item is border or name type
+            const isBorder = item.category === 'border';
+            const isName = item.category === 'name';
+
             return (
               <div
                 key={itemKey}
@@ -219,12 +225,24 @@ const Shop = () => {
                 data-aos="fade-up"
                 data-aos-delay={index * 100}
               >
-                <div className="shop-card-image">
-                  <img
-                    src={item.image_url}
-                    alt={item.name}
-                    className="shop-item-image"
-                  />
+                <div className="shop-card-image shop-preview">
+                  {isBorder ? (
+                    <div className={`preview-avatar ${item.value}`}>
+                      <span className="preview-initial">
+                        {user?.username?.charAt(0).toUpperCase() || 'U'}
+                      </span>
+                    </div>
+                  ) : isName ? (
+                    <span className={`preview-username ${item.value}`}>
+                      {user?.username || 'Felhasználó'}
+                    </span>
+                  ) : (
+                    <img
+                      src={item.image_url}
+                      alt={item.name}
+                      className="shop-item-image"
+                    />
+                  )}
                 </div>
                 <div className="shop-card-content">
                   <h3 className="shop-item-title">{item.name}</h3>
@@ -235,8 +253,11 @@ const Shop = () => {
                       {item.price}
                     </div>
                     {purchasedItems.has(item.uuid) ? (
-                      <button className="buy-btn purchased" disabled>
-                        Megvásárolva
+                      <button
+                        className="buy-btn owned"
+                        onClick={() => navigate('/profil')}
+                      >
+                        Profilban →
                       </button>
                     ) : (
                       <button

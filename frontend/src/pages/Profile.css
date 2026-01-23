@@ -488,6 +488,30 @@
   transition:
     transform 0.2s,
     border-color 0.2s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.purchased-card.active-item {
+  border-color: rgba(46, 213, 115, 0.5);
+  box-shadow: 0 0 15px rgba(46, 213, 115, 0.2);
+}
+
+.active-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: linear-gradient(135deg, #2ed573, #1abc9c);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 2;
 }
 
 .purchased-card:hover {
@@ -502,8 +526,47 @@
   background: rgba(0, 0, 0, 0.3);
 }
 
+.purchased-card-preview {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    rgba(19, 15, 64, 0.6) 0%,
+    rgba(45, 30, 100, 0.4) 100%
+  );
+}
+
+.purchased-card-preview .preview-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.purchased-card-preview .preview-initial {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+}
+
+.purchased-card-preview .preview-username {
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0.3rem 0.6rem;
+}
+
 .purchased-card-info {
   padding: 0.7rem;
+  flex: 1;
 }
 
 .purchased-card-info h4 {
@@ -520,6 +583,74 @@
   font-size: 0.7rem;
   color: var(--text-secondary);
   text-transform: uppercase;
+}
+
+.item-category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.65rem !important;
+}
+
+.item-category-badge svg {
+  font-size: 0.7rem;
+}
+
+.purchased-card-actions {
+  padding: 0 0.7rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.btn-activate,
+.btn-deactivate,
+.btn-sell {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-activate {
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  color: white;
+}
+
+.btn-activate:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+}
+
+.btn-deactivate {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-deactivate:hover {
+  background: rgba(255, 71, 87, 0.1);
+  border-color: rgba(255, 71, 87, 0.3);
+  color: #ff4757;
+}
+
+.btn-sell {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-sell:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: scale(1.02);
 }
 
 .empty-state {

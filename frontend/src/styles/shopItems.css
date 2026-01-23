@@ -1,0 +1,746 @@
+/* Shop items */
+.shop-frame {
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.default-border {
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.1) !important;
+}
+
+.default-name-color {
+  color: #ffffff !important;
+}
+
+/* Gold Frame */
+.gold-frame-css-class {
+  border: 3px solid #ffd700 !important;
+  box-shadow:
+    0 0 15px rgba(255, 215, 0, 0.5),
+    0 0 30px rgba(255, 215, 0, 0.3),
+    inset 0 0 10px rgba(255, 215, 0, 0.2) !important;
+}
+
+/* Neon Frame */
+.neon-frame-css-class {
+  border: 2px solid #00f3ff !important;
+  box-shadow:
+    0 0 10px #00f3ff,
+    0 0 20px #00f3ff,
+    0 0 40px #9d00ff,
+    inset 0 0 15px rgba(0, 243, 255, 0.3) !important;
+  animation: neon-pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes neon-pulse {
+  from {
+    box-shadow:
+      0 0 10px #00f3ff,
+      0 0 20px #00f3ff,
+      0 0 40px #9d00ff;
+  }
+  to {
+    box-shadow:
+      0 0 15px #00f3ff,
+      0 0 30px #00f3ff,
+      0 0 60px #9d00ff;
+  }
+}
+
+/* Diamond Frame */
+.diamond-frame-css-class {
+  border: 3px solid #b9f2ff !important;
+  box-shadow:
+    0 0 20px rgba(185, 242, 255, 0.8),
+    0 0 40px rgba(185, 242, 255, 0.4),
+    inset 0 0 15px rgba(185, 242, 255, 0.3) !important;
+  animation: diamond-sparkle 3s ease-in-out infinite;
+}
+
+@keyframes diamond-sparkle {
+  0%,
+  100% {
+    box-shadow:
+      0 0 20px rgba(185, 242, 255, 0.8),
+      0 0 40px rgba(185, 242, 255, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 30px rgba(255, 255, 255, 1),
+      0 0 60px rgba(185, 242, 255, 0.8);
+  }
+}
+
+/* Nature Frame */  
+.nature-frame-css-class {
+  border: 3px solid #2ed573 !important;
+  box-shadow:
+    0 0 15px rgba(46, 213, 115, 0.5),
+    0 0 30px rgba(46, 213, 115, 0.3) !important;
+}
+
+/* Cyberpunk Frame */
+.cyber-frame-css-class {
+  border: 2px solid #ff00ff !important;
+  box-shadow:
+    0 0 10px #ff00ff,
+    0 0 20px #00ffff,
+    0 0 30px #ff00ff !important;
+  animation: cyber-glitch 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes cyber-glitch {
+  0% {
+    border-color: #ff00ff;
+    box-shadow:
+      0 0 10px #ff00ff,
+      0 0 20px #00ffff;
+  }
+  25% {
+    border-color: #00ffff;
+    transform: translate(1px, -1px);
+  }
+  50% {
+    border-color: #ff00ff;
+    box-shadow:
+      0 0 15px #00ffff,
+      0 0 25px #ff00ff;
+  }
+  75% {
+    border-color: #00ffff;
+    transform: translate(-1px, 1px);
+  }
+  100% {
+    border-color: #ff00ff;
+  }
+}
+
+/* Dark Knight Frame */
+.dark-frame-css-class {
+  border: 3px solid #2c2c2c !important;
+  box-shadow:
+    0 0 20px rgba(0, 0, 0, 0.8),
+    0 0 40px rgba(100, 0, 150, 0.3),
+    inset 0 0 15px rgba(0, 0, 0, 0.5) !important;
+  animation: dark-smoke 4s ease-in-out infinite;
+}
+
+@keyframes dark-smoke {
+  0%,
+  100% {
+    box-shadow:
+      0 0 20px rgba(0, 0, 0, 0.8),
+      0 0 40px rgba(100, 0, 150, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 30px rgba(0, 0, 0, 0.9),
+      0 0 60px rgba(100, 0, 150, 0.5);
+  }
+}
+
+/* Gold Name */
+.gold-name-css-class,
+[style*='color: gold'] {
+  color: #ffd700 !important;
+  text-shadow:
+    0 0 5px rgba(255, 165, 0, 0.8),
+    0 0 10px rgba(255, 215, 0, 0.5) !important;
+}
+
+/* Rainbow Name */
+.rainbow-text-animation {
+  background: linear-gradient(
+    90deg,
+    #ff0000,
+    #ff7f00,
+    #ffff00,
+    #00ff00,
+    #0000ff,
+    #8b00ff,
+    #ff0000
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbow-shift 3s linear infinite;
+}
+
+@keyframes rainbow-shift {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Neon Green Name */
+.neon-green-name-css-class {
+  color: #00ff88 !important;
+  text-shadow:
+    0 0 5px #00ff88,
+    0 0 10px #00ff88,
+    0 0 20px #00ff88 !important;
+}
+
+/* Ice Blue Name */
+.ice-blue-name-css-class {
+  color: #00d4ff !important;
+  text-shadow:
+    0 0 5px rgba(0, 212, 255, 0.8),
+    0 0 15px rgba(0, 212, 255, 0.5) !important;
+}
+
+/* Fire Red Name */
+.fire-red-name-css-class {
+  color: #ff4500 !important;
+  text-shadow:
+    0 0 5px #ff4500,
+    0 0 10px #ff6600,
+    0 0 20px #ff0000 !important;
+  animation: fire-flicker 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes fire-flicker {
+  from {
+    text-shadow:
+      0 0 5px #ff4500,
+      0 0 10px #ff6600;
+  }
+  to {
+    text-shadow:
+      0 0 8px #ff4500,
+      0 0 15px #ff6600,
+      0 0 25px #ff0000;
+  }
+}
+
+/* Legendary Name */
+.legendary-name-css-class {
+  color: #ffd700 !important;
+  text-shadow:
+    0 0 10px rgba(255, 215, 0, 0.8),
+    0 0 20px rgba(255, 215, 0, 0.6),
+    0 0 30px rgba(255, 215, 0, 0.4) !important;
+  animation: legendary-glow 2s ease-in-out infinite;
+}
+
+@keyframes legendary-glow {
+  0%,
+  100% {
+    text-shadow:
+      0 0 10px rgba(255, 215, 0, 0.8),
+      0 0 20px rgba(255, 215, 0, 0.6);
+    filter: brightness(1);
+  }
+  50% {
+    text-shadow:
+      0 0 15px rgba(255, 255, 255, 1),
+      0 0 30px rgba(255, 215, 0, 1),
+      0 0 40px rgba(255, 215, 0, 0.8);
+    filter: brightness(1.2);
+  }
+}
+
+/* Dark Name */
+.dark-name-css-class {
+  color: #8b00ff !important;
+  text-shadow:
+    0 0 5px #8b00ff,
+    0 0 10px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Silver Name */
+.silver-name-css-class {
+  color: #c0c0c0 !important;
+  text-shadow:
+    0 0 5px rgba(192, 192, 192, 0.8),
+    0 0 10px rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Pink Frame */
+.pink-frame-css-class {
+  border: 3px solid #ff69b4 !important;
+  box-shadow:
+    0 0 15px rgba(255, 105, 180, 0.6),
+    0 0 30px rgba(255, 182, 193, 0.4) !important;
+}
+
+/* Galaxy Frame */
+.galaxy-frame-css-class {
+  border: 3px solid #9b59b6 !important;
+  box-shadow:
+    0 0 15px #9b59b6,
+    0 0 30px #3498db,
+    0 0 45px #9b59b6 !important;
+  animation: galaxy-spin 4s linear infinite;
+}
+
+@keyframes galaxy-spin {
+  0% {
+    box-shadow:
+      0 0 15px #9b59b6,
+      0 0 30px #3498db,
+      0 0 45px #9b59b6;
+  }
+  33% {
+    box-shadow:
+      0 0 15px #3498db,
+      0 0 30px #e74c3c,
+      0 0 45px #3498db;
+  }
+  66% {
+    box-shadow:
+      0 0 15px #e74c3c,
+      0 0 30px #9b59b6,
+      0 0 45px #e74c3c;
+  }
+  100% {
+    box-shadow:
+      0 0 15px #9b59b6,
+      0 0 30px #3498db,
+      0 0 45px #9b59b6;
+  }
+}
+
+/* Flame Frame */
+.flame-frame-css-class {
+  border: 3px solid #ff6600 !important;
+  box-shadow:
+    0 0 10px #ff6600,
+    0 0 20px #ff4500,
+    0 0 30px #ff0000 !important;
+  animation: flame-dance 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes flame-dance {
+  from {
+    box-shadow:
+      0 0 10px #ff6600,
+      0 0 20px #ff4500,
+      0 0 30px #ff0000;
+  }
+  to {
+    box-shadow:
+      0 0 15px #ff8800,
+      0 0 25px #ff6600,
+      0 0 40px #ff2200;
+  }
+}
+
+/* Silver Frame */
+.silver-frame-css-class {
+  border: 3px solid #c0c0c0 !important;
+  box-shadow:
+    0 0 15px rgba(192, 192, 192, 0.6),
+    0 0 30px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Bronze Frame */
+.bronze-frame-css-class {
+  border: 3px solid #cd7f32 !important;
+  box-shadow:
+    0 0 15px rgba(205, 127, 50, 0.5),
+    0 0 25px rgba(139, 90, 43, 0.3) !important;
+}
+
+/* Ice Frame */
+.ice-frame-css-class {
+  border: 3px solid #a5f3fc !important;
+  box-shadow:
+    0 0 15px rgba(165, 243, 252, 0.7),
+    0 0 30px rgba(103, 232, 249, 0.5),
+    inset 0 0 10px rgba(255, 255, 255, 0.3) !important;
+  animation: ice-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes ice-shimmer {
+  0%,
+  100% {
+    box-shadow:
+      0 0 15px rgba(165, 243, 252, 0.7),
+      0 0 30px rgba(103, 232, 249, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 25px rgba(255, 255, 255, 0.9),
+      0 0 40px rgba(165, 243, 252, 0.8);
+  }
+}
+
+/* Fire Frame */
+.fire-frame-css-class {
+  border: 3px solid #ef4444 !important;
+  box-shadow:
+    0 0 10px #ef4444,
+    0 0 20px #f97316,
+    0 0 30px #eab308 !important;
+  animation: fire-border 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes fire-border {
+  from {
+    border-color: #ef4444;
+    box-shadow:
+      0 0 10px #ef4444,
+      0 0 20px #f97316,
+      0 0 30px #eab308;
+  }
+  to {
+    border-color: #f97316;
+    box-shadow:
+      0 0 15px #f97316,
+      0 0 25px #eab308,
+      0 0 35px #ef4444;
+  }
+}
+
+/* Poison Frame */
+.poison-frame-css-class {
+  border: 3px solid #22c55e !important;
+  box-shadow:
+    0 0 15px #22c55e,
+    0 0 30px #16a34a,
+    inset 0 0 10px rgba(34, 197, 94, 0.3) !important;
+  animation: poison-bubble 2s ease-in-out infinite;
+}
+
+@keyframes poison-bubble {
+  0%,
+  100% {
+    box-shadow:
+      0 0 15px #22c55e,
+      0 0 30px #16a34a;
+  }
+  50% {
+    box-shadow:
+      0 0 20px #4ade80,
+      0 0 40px #22c55e;
+  }
+}
+
+/* Blood Frame */
+.blood-frame-css-class {
+  border: 3px solid #991b1b !important;
+  box-shadow:
+    0 0 15px rgba(153, 27, 27, 0.8),
+    0 0 30px rgba(127, 29, 29, 0.5) !important;
+}
+
+/* Moonlight Frame */
+.moonlight-frame-css-class {
+  border: 3px solid #e2e8f0 !important;
+  box-shadow:
+    0 0 20px rgba(226, 232, 240, 0.8),
+    0 0 40px rgba(148, 163, 184, 0.5),
+    0 0 60px rgba(100, 116, 139, 0.3) !important;
+  animation: moonlight-glow 4s ease-in-out infinite;
+}
+
+@keyframes moonlight-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 20px rgba(226, 232, 240, 0.8),
+      0 0 40px rgba(148, 163, 184, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 30px rgba(255, 255, 255, 0.9),
+      0 0 50px rgba(226, 232, 240, 0.7);
+  }
+}
+
+/* Sunlight Frame */
+.sunlight-frame-css-class {
+  border: 3px solid #fbbf24 !important;
+  box-shadow:
+    0 0 20px rgba(251, 191, 36, 0.7),
+    0 0 40px rgba(245, 158, 11, 0.5) !important;
+  animation: sunlight-pulse 2s ease-in-out infinite;
+}
+
+@keyframes sunlight-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 20px rgba(251, 191, 36, 0.7),
+      0 0 40px rgba(245, 158, 11, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 30px rgba(251, 191, 36, 0.9),
+      0 0 50px rgba(245, 158, 11, 0.7);
+  }
+}
+
+/* Electric Frame */
+.electric-frame-css-class {
+  border: 2px solid #facc15 !important;
+  box-shadow:
+    0 0 10px #facc15,
+    0 0 20px #a3e635,
+    0 0 30px #22d3ee !important;
+  animation: electric-zap 0.2s ease-in-out infinite;
+}
+
+@keyframes electric-zap {
+  0%,
+  100% {
+    box-shadow:
+      0 0 10px #facc15,
+      0 0 20px #a3e635,
+      0 0 30px #22d3ee;
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(1px, 0);
+  }
+  50% {
+    box-shadow:
+      0 0 15px #22d3ee,
+      0 0 25px #facc15,
+      0 0 35px #a3e635;
+    transform: translate(-1px, 0);
+  }
+  75% {
+    transform: translate(0, 1px);
+  }
+}
+
+/* Rainbow Frame */
+.rainbow-frame-css-class {
+  border: 3px solid transparent !important;
+  background:
+    linear-gradient(#1a1a2e, #1a1a2e) padding-box,
+    linear-gradient(
+        90deg,
+        #ff0000,
+        #ff7f00,
+        #ffff00,
+        #00ff00,
+        #0000ff,
+        #8b00ff,
+        #ff0000
+      )
+      border-box !important;
+  animation: rainbow-border 3s linear infinite;
+}
+
+@keyframes rainbow-border {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}
+
+/* Pink Name */
+.pink-name-css-class {
+  color: #ff69b4 !important;
+  text-shadow:
+    0 0 5px #ff69b4,
+    0 0 10px rgba(255, 182, 193, 0.6) !important;
+}
+
+/* Purple Name */
+.purple-name-css-class {
+  color: #a855f7 !important;
+  text-shadow:
+    0 0 5px #a855f7,
+    0 0 10px rgba(168, 85, 247, 0.5) !important;
+}
+
+/* Orange Name */
+.orange-name-css-class {
+  color: #f97316 !important;
+  text-shadow:
+    0 0 5px #f97316,
+    0 0 10px rgba(251, 146, 60, 0.5) !important;
+}
+
+/* Mint Name */
+.mint-name-css-class {
+  color: #2dd4bf !important;
+  text-shadow:
+    0 0 5px #2dd4bf,
+    0 0 15px rgba(45, 212, 191, 0.5) !important;
+}
+
+/* Coral Name */
+.coral-name-css-class {
+  color: #f87171 !important;
+  text-shadow:
+    0 0 5px #f87171,
+    0 0 10px rgba(248, 113, 113, 0.5) !important;
+}
+
+/* Electric Blue Name */
+.electric-blue-name-css-class {
+  color: #3b82f6 !important;
+  text-shadow:
+    0 0 5px #3b82f6,
+    0 0 15px #60a5fa,
+    0 0 25px #93c5fd !important;
+  animation: electric-text 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes electric-text {
+  from {
+    text-shadow:
+      0 0 5px #3b82f6,
+      0 0 15px #60a5fa;
+  }
+  to {
+    text-shadow:
+      0 0 10px #60a5fa,
+      0 0 20px #3b82f6,
+      0 0 30px #93c5fd;
+  }
+}
+
+/* Galaxy Name */
+.galaxy-name-css-class {
+  background: linear-gradient(90deg, #9b59b6, #3498db, #e74c3c, #9b59b6);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: galaxy-text 4s linear infinite;
+}
+
+@keyframes galaxy-text {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 300% center;
+  }
+}
+
+/* Midnight Name */
+.midnight-name-css-class {
+  color: #1e3a5f !important;
+  text-shadow:
+    0 0 10px #1e3a5f,
+    0 0 20px #0ea5e9,
+    0 0 30px rgba(14, 165, 233, 0.3) !important;
+}
+
+/* Poison Name */
+.poison-name-css-class {
+  color: #22c55e !important;
+  text-shadow:
+    0 0 5px #22c55e,
+    0 0 15px #16a34a,
+    0 0 25px rgba(34, 197, 94, 0.5) !important;
+  animation: poison-drip 1.5s ease-in-out infinite;
+}
+
+@keyframes poison-drip {
+  0%,
+  100% {
+    text-shadow:
+      0 0 5px #22c55e,
+      0 0 15px #16a34a;
+  }
+  50% {
+    text-shadow:
+      0 0 10px #4ade80,
+      0 0 20px #22c55e,
+      0 0 30px #16a34a;
+  }
+}
+
+/* Moonlight Name */
+.moonlight-name-css-class {
+  color: #e2e8f0 !important;
+  text-shadow:
+    0 0 10px rgba(226, 232, 240, 0.8),
+    0 0 20px rgba(148, 163, 184, 0.5) !important;
+  animation: moon-text 3s ease-in-out infinite;
+}
+
+@keyframes moon-text {
+  0%,
+  100% {
+    text-shadow:
+      0 0 10px rgba(226, 232, 240, 0.8),
+      0 0 20px rgba(148, 163, 184, 0.5);
+  }
+  50% {
+    text-shadow:
+      0 0 15px rgba(255, 255, 255, 0.9),
+      0 0 25px rgba(226, 232, 240, 0.7);
+  }
+}
+
+/* Sunlight Name */
+.sunlight-name-css-class {
+  color: #fbbf24 !important;
+  text-shadow:
+    0 0 10px rgba(251, 191, 36, 0.8),
+    0 0 20px rgba(245, 158, 11, 0.5) !important;
+}
+
+/* Blood Name */
+.blood-name-css-class {
+  color: #dc2626 !important;
+  text-shadow:
+    0 0 5px #dc2626,
+    0 0 15px #991b1b,
+    0 0 25px rgba(153, 27, 27, 0.5) !important;
+}
+
+/* Psychedelic Name */
+.psychedelic-name-css-class {
+  background: linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: psychedelic-shift 1.5s linear infinite;
+}
+
+@keyframes psychedelic-shift {
+  0% {
+    background-position: 0% center;
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    background-position: 200% center;
+    filter: hue-rotate(360deg);
+  }
+}
+
+/* Platinum Name */
+.platinum-name-css-class {
+  color: #e5e7eb !important;
+  text-shadow:
+    0 0 5px #e5e7eb,
+    0 0 15px #d1d5db,
+    0 0 25px rgba(229, 231, 235, 0.5) !important;
+  animation: platinum-shine 2s ease-in-out infinite;
+}
+
+@keyframes platinum-shine {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.3);
+  }
+}
+
+/* Bronze Name */
+.bronze-name-css-class {
+  color: #cd7f32 !important;
+  text-shadow:
+    0 0 5px #cd7f32,
+    0 0 10px rgba(139, 90, 43, 0.5) !important;
+}
