@@ -63,6 +63,12 @@
   gap: 1.5rem;
 }
 
+.input-group-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .input-group {
   position: relative;
   display: flex;
@@ -96,8 +102,44 @@
   box-shadow: 0 0 15px rgba(108, 92, 231, 0.3);
 }
 
+.modern-input.input-error {
+  border-color: #ff4757;
+  box-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
+}
+
 .input-group:focus-within .input-icon {
   color: var(--primary-purple);
+}
+
+/* Validation List */
+.validation-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+  padding-left: 0.5rem;
+}
+
+.validation-item {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.3s ease;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.validation-item.met {
+  color: #2ecc71;
+  background: rgba(46, 204, 113, 0.1);
+  border: 1px solid rgba(46, 204, 113, 0.2);
+}
+
+.dot {
+  font-size: 0.6rem;
 }
 
 .captcha-container {

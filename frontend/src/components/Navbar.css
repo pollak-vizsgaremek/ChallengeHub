@@ -63,10 +63,10 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 20px rgba(165, 180, 252, 0.3);
+  text-decoration: none;
 }
 
 .navbar-username.gold-name-css-class,
-.navbar-username.rainbow-text-animation,
 .navbar-username.neon-green-name-css-class,
 .navbar-username.ice-blue-name-css-class,
 .navbar-username.fire-red-name-css-class,

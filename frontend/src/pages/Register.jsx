@@ -5,6 +5,7 @@ import './Register.css'; // Using the specific CSS file for Register
 import { Link, useNavigate } from 'react-router-dom';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 import toast from 'react-hot-toast';
+import { FaCheck, FaTimes } from 'react-icons/fa';
 
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
@@ -15,6 +16,14 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [captchaToken, setCaptchaToken] = useState('');
+  const [passwordCriteria, setPasswordCriteria] = useState({
+    length: false,
+    upper: false,
+    lower: false,
+    number: false,
+  });
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isEmailTouched, setIsEmailTouched] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,10 +33,45 @@ const Register = () => {
     });
   }, []);
 
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
+  const handleEmailChange = (e) => {
+    const val = e.target.value;
+    setEmail(val);
+    setIsEmailTouched(true);
+    setIsEmailValid(validateEmail(val));
+  };
+
+  const handlePasswordChange = (e) => {
+    const val = e.target.value;
+    setPassword(val);
+    setPasswordCriteria({
+      length: val.length >= 8,
+      upper: /[A-Z]/.test(val),
+      lower: /[a-z]/.test(val),
+      number: /[0-9]/.test(val),
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!captchaToken) {
       toast.error('Kérlek igazold, hogy nem vagy robot!');
+      return;
+    }
+
+    if (!isEmailValid) {
+      toast.error('Kérlek adj meg egy érvényes email címet!');
+      return;
+    }
+
+    const { length, upper, lower, number } = passwordCriteria;
+    if (!length || !upper || !lower || !number) {
+      toast.error('A jelszó nem felel meg a követelményeknek!');
       return;
     }
 
@@ -140,45 +184,73 @@ const Register = () => {
                 <input
                   type="email"
                   placeholder="Email címed"
-                  className="modern-input"
+                  className={`modern-input ${!isEmailValid && isEmailTouched ? 'input-error' : ''}`}
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleEmailChange}
                   required
                 />
               </div>
 
               {/* Password Input */}
-              <div className="input-group">
-                <div className="input-icon">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect
-                      x="3"
-                      y="11"
-                      width="18"
-                      height="11"
-                      rx="2"
-                      ry="2"
-                    ></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                  </svg>
+              <div className="input-group-wrapper">
+                <div className="input-group">
+                  <div className="input-icon">
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect
+                        x="3"
+                        y="11"
+                        width="18"
+                        height="11"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                  </div>
+                  <input
+                    type="password"
+                    placeholder="Jelszó"
+                    className="modern-input"
+                    value={password}
+                    onChange={handlePasswordChange}
+                    required
+                  />
                 </div>
-                <input
-                  type="password"
-                  placeholder="Jelszó"
-                  className="modern-input"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+
+                {/* Password Requirements */}
+                <div className="validation-list">
+                  <div
+                    className={`validation-item ${passwordCriteria.length ? 'met' : ''}`}
+                  >
+                    {passwordCriteria.length ? <FaCheck /> : <FaTimes />}{' '}
+                    Legalább 8 karakter
+                  </div>
+                  <div
+                    className={`validation-item ${passwordCriteria.upper ? 'met' : ''}`}
+                  >
+                    {passwordCriteria.upper ? <FaCheck /> : <FaTimes />}{' '}
+                    Nagybetű
+                  </div>
+                  <div
+                    className={`validation-item ${passwordCriteria.lower ? 'met' : ''}`}
+                  >
+                    {passwordCriteria.lower ? <FaCheck /> : <FaTimes />} Kisbetű
+                  </div>
+                  <div
+                    className={`validation-item ${passwordCriteria.number ? 'met' : ''}`}
+                  >
+                    {passwordCriteria.number ? <FaCheck /> : <FaTimes />} Szám
+                  </div>
+                </div>
               </div>
 
               {/* Confirm Password Input */}

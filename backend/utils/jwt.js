@@ -17,7 +17,7 @@ export const createAccessToken = (user) => {
     SECRET,
     {
       algorithm: 'HS512',
-      expiresIn: '10m',
+      expiresIn: '1d',
       issuer: 'http://localhost:3300',
       subject: user.uuid,
     }

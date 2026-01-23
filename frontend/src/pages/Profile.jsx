@@ -45,6 +45,13 @@ const Profile = () => {
     nameColor: null,
   });
 
+  // Modal states
+  const [sellModalOpen, setSellModalOpen] = useState(false);
+  const [itemToSell, setItemToSell] = useState(null);
+
+  // Filter state
+  const [filter, setFilter] = useState('all');
+
   const activityLevels = [
     { id: 'casual', name: 'Laza', icon: <FaCoffee /> },
     { id: 'active', name: 'Aktív', icon: <FaFire /> },
@@ -144,15 +151,13 @@ const Profile = () => {
     }
   };
 
-  const handleSellItem = async (item) => {
-    const sellPrice = Math.floor(item.price * 0.65);
-    if (
-      !window.confirm(
-        `Biztosan eladod "${item.name}" terméket ${sellPrice} 🪙 coinért? (Eredeti ár: ${item.price})`
-      )
-    ) {
-      return;
-    }
+  const handleSellItem = (item) => {
+    setItemToSell(item);
+    setSellModalOpen(true);
+  };
+
+  const confirmSell = async () => {
+    if (!itemToSell) return;
 
     try {
       const response = await fetch('http://localhost:3300/api/v1/shop/sell', {
@@ -163,7 +168,7 @@ const Profile = () => {
         },
         body: JSON.stringify({
           userId: user.userId,
-          itemId: item.uuid,
+          itemId: itemToSell.uuid,
         }),
       });
 
@@ -181,6 +186,9 @@ const Profile = () => {
     } catch (error) {
       console.error('Error selling item:', error);
       toast.error('Hálózati hiba!');
+    } finally {
+      setSellModalOpen(false);
+      setItemToSell(null);
     }
   };
 
@@ -411,6 +419,36 @@ const Profile = () => {
     return category ? category.name : categoryId;
   };
 
+  const getCategoryType = (categoryId) => {
+    const category = categories.find((c) => c.uuid === categoryId);
+    if (!category) return { label: '', isSport: false };
+
+    const isSport = [
+      'sport',
+      'active',
+      'physical',
+      'movement',
+      'aktív',
+      'aktiv',
+    ].includes(category.type?.toLowerCase() || '');
+
+    return {
+      label: isSport ? 'Aktív' : 'Egyéni',
+      isSport,
+      style: isSport
+        ? {
+            background: 'rgba(255, 71, 87, 0.2)',
+            color: '#ff4757',
+            border: '1px solid rgba(255, 71, 87, 0.4)',
+          }
+        : {
+            background: 'rgba(46, 213, 115, 0.2)',
+            color: '#2ed573',
+            border: '1px solid rgba(46, 213, 115, 0.4)',
+          },
+    };
+  };
+
   if (loading) {
     return (
       <>
@@ -437,7 +475,7 @@ const Profile = () => {
         <div className="profile-top-row">
           <div className="profile-header-card">
             <div
-              className={`profile-avatar ${activeItems.border?.value || ''}`}
+              className={`profile-avatar ${activeItems.border?.value || 'default-border'}`}
             >
               {profile?.username?.charAt(0) || '?'}
             </div>
@@ -672,15 +710,24 @@ const Profile = () => {
                   <div className="edit-group">
                     <div className="edit-group-label">Kategóriák</div>
                     <div className="category-chips">
-                      {categories.map((category) => (
-                        <button
-                          key={category.uuid}
-                          className={`category-chip ${selectedInterests.includes(category.uuid) ? 'selected' : ''}`}
-                          onClick={() => toggleInterest(category.uuid)}
-                        >
-                          {category.name}
-                        </button>
-                      ))}
+                      {categories.map((category) => {
+                        const typeInfo = getCategoryType(category.uuid);
+                        return (
+                          <button
+                            key={category.uuid}
+                            className={`category-chip ${selectedInterests.includes(category.uuid) ? 'selected' : ''}`}
+                            onClick={() => toggleInterest(category.uuid)}
+                          >
+                            <span>{category.name}</span>
+                            <span
+                              className="chip-type-badge"
+                              style={typeInfo.style}
+                            >
+                              {typeInfo.label}
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                   <div className="edit-buttons">
@@ -718,11 +765,20 @@ const Profile = () => {
                     )?.name || 'Nincs'}
                   </span>
                   {profile?.interests?.length > 0 ? (
-                    profile.interests.map((catId) => (
-                      <span key={catId} className="interest-tag">
-                        {getCategoryName(catId)}
-                      </span>
-                    ))
+                    profile.interests.map((catId) => {
+                      const typeInfo = getCategoryType(catId);
+                      return (
+                        <span key={catId} className="interest-tag">
+                          {getCategoryName(catId)}
+                          <span
+                            className="tag-type-badge"
+                            style={typeInfo.style}
+                          >
+                            {typeInfo.label}
+                          </span>
+                        </span>
+                      );
+                    })
                   ) : (
                     <span className="no-data">Nincs kategória</span>
                   )}
@@ -737,91 +793,111 @@ const Profile = () => {
               <h2>
                 <FaShoppingCart /> Termékeim
               </h2>
+              <div className="profile-filter-buttons">
+                <button
+                  className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
+                  onClick={() => setFilter('all')}
+                >
+                  Összes
+                </button>
+                <button
+                  className={`filter-btn ${filter === 'border' ? 'active' : ''}`}
+                  onClick={() => setFilter('border')}
+                >
+                  Keret
+                </button>
+                <button
+                  className={`filter-btn ${filter === 'name' ? 'active' : ''}`}
+                  onClick={() => setFilter('name')}
+                >
+                  Név szín
+                </button>
+              </div>
             </div>
             <div className="section-content">
               {profile?.purchasedItems?.length > 0 ? (
                 <div className="purchased-grid">
-                  {profile.purchasedItems.map((item) => {
-                    const isActiveBorder =
-                      activeItems.border?.uuid === item.uuid;
-                    const isActiveNameColor =
-                      activeItems.nameColor?.uuid === item.uuid;
-                    const isActive = isActiveBorder || isActiveNameColor;
+                  {profile.purchasedItems
+                    .filter(
+                      (item) => filter === 'all' || item.category === filter
+                    )
+                    .map((item) => {
+                      const isActiveBorder =
+                        activeItems.border?.uuid === item.uuid;
+                      const isActiveNameColor =
+                        activeItems.nameColor?.uuid === item.uuid;
+                      const isActive = isActiveBorder || isActiveNameColor;
 
-                    return (
-                      <div
-                        key={item.uuid}
-                        className={`purchased-card ${isActive ? 'active-item' : ''}`}
-                      >
-                        {isActive && (
-                          <div className="active-badge">
-                            <FaCheck /> Aktív
-                          </div>
-                        )}
-                        <div className="purchased-card-preview">
-                          {item.category === 'border' ? (
-                            <div className={`preview-avatar ${item.value}`}>
-                              <span className="preview-initial">
-                                {profile?.username?.charAt(0).toUpperCase() ||
-                                  'U'}
-                              </span>
+                      return (
+                        <div
+                          key={item.uuid}
+                          className={`purchased-card ${isActive ? 'active-item' : ''}`}
+                        >
+                          {isActive && (
+                            <div className="active-badge">
+                              <FaCheck /> Aktív
                             </div>
-                          ) : (
-                            <span className={`preview-username ${item.value}`}>
-                              {profile?.username || 'Felhasználó'}
-                            </span>
                           )}
-                        </div>
-                        <div className="purchased-card-info">
-                          <h4
-                            className={
-                              item.category === 'name' ? item.value : ''
-                            }
-                          >
-                            {item.name}
-                          </h4>
-                          <span className="item-category-badge">
+                          <div className="purchased-card-preview">
                             {item.category === 'border' ? (
-                              <>
-                                <FaImage /> Keret
-                              </>
+                              <div className={`preview-avatar ${item.value}`}>
+                                <span className="preview-initial">
+                                  {profile?.username?.charAt(0).toUpperCase() ||
+                                    'U'}
+                                </span>
+                              </div>
                             ) : (
-                              <>
-                                <FaTag /> Név szín
-                              </>
+                              <span
+                                className={`preview-username ${item.value}`}
+                              >
+                                {profile?.username || 'Felhasználó'}
+                              </span>
                             )}
-                          </span>
-                        </div>
-                        <div className="purchased-card-actions">
-                          {isActive ? (
+                          </div>
+                          <div className="purchased-card-info">
+                            <h4>{item.name}</h4>
+                            <span className="item-category-badge">
+                              {item.category === 'border' ? (
+                                <>
+                                  <FaImage /> Keret
+                                </>
+                              ) : (
+                                <>
+                                  <FaTag /> Név szín
+                                </>
+                              )}
+                            </span>
+                          </div>
+                          <div className="purchased-card-actions">
+                            {isActive ? (
+                              <button
+                                className="btn-deactivate"
+                                onClick={() =>
+                                  handleRemoveActiveItem(item.category)
+                                }
+                              >
+                                Eltávolítás
+                              </button>
+                            ) : (
+                              <button
+                                className="btn-activate"
+                                onClick={() =>
+                                  handleSetActiveItem(item.uuid, item.category)
+                                }
+                              >
+                                Használat
+                              </button>
+                            )}
                             <button
-                              className="btn-deactivate"
-                              onClick={() =>
-                                handleRemoveActiveItem(item.category)
-                              }
+                              className="btn-sell"
+                              onClick={() => handleSellItem(item)}
                             >
-                              Eltávolítás
+                              Eladás ({Math.floor(item.price * 0.65)} 🪙)
                             </button>
-                          ) : (
-                            <button
-                              className="btn-activate"
-                              onClick={() =>
-                                handleSetActiveItem(item.uuid, item.category)
-                              }
-                            >
-                              Használat
-                            </button>
-                          )}
-                          <button
-                            className="btn-sell"
-                            onClick={() => handleSellItem(item)}
-                          >
-                            Eladás ({Math.floor(item.price * 0.65)} 🪙)
-                          </button>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
                 </div>
               ) : (
                 <div className="empty-state">
@@ -842,6 +918,38 @@ const Profile = () => {
       </div>
 
       <Footer />
+
+      {/* Confirmation Modal */}
+      {sellModalOpen && itemToSell && (
+        <div className="modal-overlay" onClick={() => setSellModalOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon">⚠️</div>
+            <h3 className="modal-title">Tárgy eladása</h3>
+            <p className="modal-message">
+              Biztosan eladod a(z){' '}
+              <span className="modal-highlight">{itemToSell.name}</span>{' '}
+              tárgyat?
+              <br />
+              <br />
+              Visszakapsz:{' '}
+              <span className="modal-highlight">
+                {Math.floor(itemToSell.price * 0.65)} 🪙
+              </span>
+            </p>
+            <div className="modal-actions">
+              <button
+                className="btn-modal cancel"
+                onClick={() => setSellModalOpen(false)}
+              >
+                Mégse
+              </button>
+              <button className="btn-modal confirm" onClick={confirmSell}>
+                Eladás
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
