@@ -6,6 +6,7 @@
   padding: 6rem 3rem 2rem;
   position: relative;
   z-index: 1;
+  overflow-x: hidden;
 }
 
 .profile-top-row {

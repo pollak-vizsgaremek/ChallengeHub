@@ -59,7 +59,12 @@ const Profile = () => {
   ];
 
   useEffect(() => {
-    AOS.init({ once: true, duration: 800 });
+    AOS.init({
+      once: true,
+      duration: 1000, 
+      offset: 50,
+      easing: 'ease-out-cubic',
+    });
 
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -265,34 +270,43 @@ const Profile = () => {
   };
 
   const handleSaveProfile = async (field) => {
-    setError('');
-    setSuccess('');
-
     // Validation
     if (field === 'username' && !formData.username.trim()) {
-      setError('A felhasználónév nem lehet üres!');
+      toast.error('A felhasználónév nem lehet üres!');
       return;
     }
 
     if (field === 'email') {
       if (!formData.email.trim()) {
-        setError('Az email cím nem lehet üres!');
+        toast.error('Az email cím nem lehet üres!');
         return;
       }
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.email)) {
-        setError('Érvénytelen email cím formátum!');
+        toast.error('Érvénytelen email cím formátum!');
         return;
       }
     }
 
     if (field === 'password') {
-      if (!formData.password || formData.password.length < 6) {
-        setError('A jelszónak legalább 6 karakter hosszúnak kell lennie!');
+      if (formData.password.length < 8) {
+        toast.error('A jelszónak legalább 8 karakter hosszúnak kell lennie!');
+        return;
+      }
+      if (!/[A-Z]/.test(formData.password)) {
+        toast.error('A jelszónak tartalmaznia kell legalább egy nagybetűt!');
+        return;
+      }
+      if (!/[a-z]/.test(formData.password)) {
+        toast.error('A jelszónak tartalmaznia kell legalább egy kisbetűt!');
+        return;
+      }
+      if (!/[0-9]/.test(formData.password)) {
+        toast.error('A jelszónak tartalmaznia kell legalább egy számot!');
         return;
       }
       if (formData.password !== formData.passwordConfirm) {
-        setError('A jelszavak nem egyeznek!');
+        toast.error('A jelszavak nem egyeznek!');
         return;
       }
     }
@@ -301,7 +315,7 @@ const Profile = () => {
     if (field === 'username' || field === 'email') {
       const existsCheck = await checkExists(field, formData[field]);
       if (existsCheck.exists) {
-        setError(
+        toast.error(
           field === 'username'
             ? 'Ez a felhasználónév már foglalt!'
             : 'Ez az email cím már foglalt!'
@@ -333,7 +347,7 @@ const Profile = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess('Sikeres mentés!');
+        toast.success('Sikeres mentés!');
         setEditMode(null);
 
         // Update local storage if username changed
@@ -356,20 +370,17 @@ const Profile = () => {
           }));
         }
       } else {
-        setError(data.message || 'Hiba történt a mentés során!');
+        toast.error(data.message || 'Hiba történt a mentés során!');
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      setError('Hálózati hiba történt!');
+      toast.error('Hálózati hiba történt!');
     }
   };
 
   const handleSaveInterests = async () => {
-    setError('');
-    setSuccess('');
-
     if (selectedInterests.length === 0) {
-      setError('Legalább egy érdeklődési kört ki kell választanod!');
+      toast.error('Legalább egy érdeklődési kört ki kell választanod!');
       return;
     }
 
@@ -391,16 +402,16 @@ const Profile = () => {
       );
 
       if (response.ok) {
-        setSuccess('Érdeklődési körök sikeresen frissítve!');
+        toast.success('Érdeklődési körök sikeresen frissítve!');
         setEditMode(null);
         fetchProfile(user.userId);
       } else {
         const data = await response.json();
-        setError(data.message || 'Hiba történt a mentés során!');
+        toast.error(data.message || 'Hiba történt a mentés során!');
       }
     } catch (error) {
       console.error('Error updating interests:', error);
-      setError('Hálózati hiba történt!');
+      toast.error('Hálózati hiba történt!');
     }
   };
 
@@ -470,10 +481,14 @@ const Profile = () => {
 
       <Navbar />
 
-      <div className="profile-container" data-aos="fade-in">
+      <div className="profile-container">
         {/* Top Row - Header + Stats */}
         <div className="profile-top-row">
-          <div className="profile-header-card">
+          <div
+            className="profile-header-card"
+            data-aos="zoom-in"
+            data-aos-delay="0"
+          >
             <div
               className={`profile-avatar ${activeItems.border?.value || 'default-border'}`}
             >
@@ -488,19 +503,31 @@ const Profile = () => {
           </div>
 
           <div className="profile-stats">
-            <div className="stat-card">
+            <div
+              className="stat-card"
+              data-aos="flip-left"
+              data-aos-delay="200"
+            >
               <div className="stat-icon">🪙</div>
               <div className="stat-value">{profile?.coin || 0}</div>
               <div className="stat-label">Coin</div>
             </div>
-            <div className="stat-card">
+            <div
+              className="stat-card"
+              data-aos="flip-left"
+              data-aos-delay="400"
+            >
               <div className="stat-icon">
                 <FaStar />
               </div>
               <div className="stat-value">{profile?.xp || 0}</div>
               <div className="stat-label">XP</div>
             </div>
-            <div className="stat-card">
+            <div
+              className="stat-card"
+              data-aos="flip-left"
+              data-aos-delay="600"
+            >
               <div className="stat-icon">
                 <FaShoppingCart />
               </div>
@@ -514,11 +541,12 @@ const Profile = () => {
 
         {/* Main Grid */}
         <div className="profile-main-grid">
-          {error && <div className="profile-message error">{error}</div>}
-          {success && <div className="profile-message success">{success}</div>}
-
           {/* Account Settings */}
-          <div className="profile-section">
+          <div
+            className="profile-section"
+            data-aos="fade-right"
+            data-aos-delay="400"
+          >
             <div className="section-title">
               <h2>
                 <FaUser /> Fiók
@@ -551,7 +579,6 @@ const Profile = () => {
                           ...formData,
                           username: profile.username,
                         });
-                        setError('');
                       }}
                     >
                       ✕
@@ -595,7 +622,6 @@ const Profile = () => {
                       onClick={() => {
                         setEditMode(null);
                         setFormData({ ...formData, email: profile.email });
-                        setError('');
                       }}
                     >
                       ✕
@@ -653,7 +679,6 @@ const Profile = () => {
                           password: '',
                           passwordConfirm: '',
                         });
-                        setError('');
                       }}
                     >
                       ✕
@@ -675,7 +700,11 @@ const Profile = () => {
           </div>
 
           {/* Interests */}
-          <div className="profile-section">
+          <div
+            className="profile-section"
+            data-aos="fade-left"
+            data-aos-delay="600"
+          >
             <div className="section-title">
               <h2>
                 <FaBullseye /> Érdeklődés
@@ -745,7 +774,6 @@ const Profile = () => {
                         setSelectedActivityLevel(
                           profile?.activity_level || 'casual'
                         );
-                        setError('');
                       }}
                     >
                       Mégse
@@ -788,7 +816,11 @@ const Profile = () => {
           </div>
 
           {/* Purchased Items */}
-          <div className="profile-section full-width">
+          <div
+            className="profile-section full-width"
+            data-aos="fade-up"
+            data-aos-delay="800"
+          >
             <div className="section-title">
               <h2>
                 <FaShoppingCart /> Termékeim

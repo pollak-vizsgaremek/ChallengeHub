@@ -11,7 +11,6 @@ export const login = async (username, password) => {
       OR: [{ username: username }, { email: username }],
     },
     include: {
-      user_group: true,
       user_endpoint_access: true,
     },
   });
@@ -42,7 +41,7 @@ export const login = async (username, password) => {
     refreshToken,
     username: user.username,
     email: user.email,
-    isAdmin: user.user_group?.nev === 'ADMIN',
+    isAdmin: user.admin === 1,
     onboardingCompleted: user.onboarding_completed,
   };
 };
@@ -66,30 +65,12 @@ export const register = async (username, email, password, passwordConfirm) => {
 
   const encryptedPassword = bcrypt.hashSync(password, 12);
 
-  let group = await prisma.user_group.findFirst({
-    where: { nev: 'USER' },
-  });
-
-  // Create group if it doesn't exist
-  if (!group) {
-    group = await prisma.user_group.create({
-      data: {
-        nev: 'USER',
-        c: true,
-        r: true,
-        u: false,
-        d: false,
-      },
-    });
-  }
-
   // Create user
   const newUser = await prisma.users.create({
     data: {
       username,
       email,
       password: encryptedPassword,
-      group_id: group.uuid,
       xp: 0,
       coin: 0,
     },

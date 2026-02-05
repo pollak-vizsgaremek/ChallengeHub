@@ -142,48 +142,58 @@ body {
 }
 
 .btn-shop {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 15px;
-  padding: 0.5rem 1.2rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, var(--accent-green), #27ae60);
   color: var(--text-white);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 0 2rem 0 1rem;
+  box-shadow: 0 4px 15px rgba(46, 213, 115, 0.3);
+  height: 65px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
+.shop-icon-container {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--text-white);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+.shop-text-container {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  min-width: 90px;
-  height: 65px;
+  align-items: flex-start;
+  line-height: 0.9;
 }
 
-.btn-shop svg {
-  width: 24px;
-  height: 24px;
-  stroke: var(--accent-green);
-  transition: all 0.3s ease;
-}
-
-.btn-shop .btn-label {
-  font-size: 1.1rem;
-  letter-spacing: 1px;
+.shop-main-text {
+  font-size: 1.5rem;
+  font-weight: 400;
   text-transform: uppercase;
   color: var(--text-white);
-  transition: all 0.3s ease;
 }
 
 .btn-shop:hover {
-  background: var(--glass-bg-hover);
-  border-color: var(--accent-green);
   transform: skew(-10deg) translateY(-3px);
-  box-shadow: 0 8px 25px rgba(46, 213, 115, 0.2);
-}
-
-.btn-shop:hover svg {
-  stroke: var(--text-white);
-  transform: scale(1.1);
+  box-shadow: 0 8px 30px rgba(46, 213, 115, 0.5);
+  filter: brightness(1.1);
 }
 
 .btn-shop:active {
-  transform: skew(-10deg) scale(0.95);
+  transform: skew(-10deg) scale(0.98);
+}
+
+.btn-shop .shop-icon-container,
+.btn-shop .shop-text-container {
+  transform: skew(10deg);
 }
 
 .btn-login {

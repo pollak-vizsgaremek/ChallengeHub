@@ -27,7 +27,8 @@ app.use(
   endpointAccessMiddleware,
   categoryController
 );
-app.use('/api/v1/users',
+app.use(
+  '/api/v1/users',
   authMiddleware,
   endpointAccessMiddleware,
   userController

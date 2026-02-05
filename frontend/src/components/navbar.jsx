@@ -103,7 +103,7 @@ const Navbar = () => {
       <div className={`nav-actions ${menuOpen ? 'open' : ''}`}>
         {isLoggedIn ? (
           <>
-            <div className="navbar-user">
+            <Link to="/profil" className="navbar-user-pill">
               <div
                 className={`navbar-avatar-frame ${activeItems.border?.value || 'default-border'}`}
               >
@@ -116,33 +116,64 @@ const Navbar = () => {
                     .toUpperCase()}
                 </div>
               </div>
-              <Link
-                to="/profil"
+              <span
                 className={`navbar-username ${activeItems.nameColor?.value || 'default-name-color'}`}
               >
                 {username}
-              </Link>
-            </div>
+              </span>
+            </Link>
             <Link
               to="/bolt"
               className="btn btn-shop"
               onClick={() => setMenuOpen(false)}
             >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="9" cy="21" r="1"></circle>
-                <circle cx="20" cy="21" r="1"></circle>
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-              </svg>
-              <span className="btn-label">ÜZLET</span>
+              <div className="shop-icon-container">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="9" cy="21" r="1"></circle>
+                  <circle cx="20" cy="21" r="1"></circle>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+              </div>
+              <div className="shop-text-container">
+                <span className="shop-main-text">BOLT</span>
+              </div>
+            </Link>
+            <Link
+              to="/ranglista"
+              className="btn btn-leaderboard"
+              onClick={() => setMenuOpen(false)}
+            >
+              <div className="leaderboard-icon-container">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                  <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                  <path d="M4 22h16"></path>
+                  <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                  <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                  <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                </svg>
+              </div>
+              <div className="leaderboard-text-container">
+                <span className="leaderboard-main-text">RANGLISTA</span>
+              </div>
             </Link>
             <button onClick={handleLogout} className="btn btn-logout">
               <div className="logout-icon-container">

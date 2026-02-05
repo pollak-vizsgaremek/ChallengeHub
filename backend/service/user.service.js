@@ -279,3 +279,59 @@ export const getUserPurchasedItemsWithDetails = async (userId) => {
     purchased_at: p.purchased_at,
   }));
 };
+
+// Get leaderboard - top 10 users by XP + current user rank
+export const getLeaderboard = async (currentUserId) => {
+  // Get top 10 users by XP
+  const top10 = await prisma.users.findMany({
+    orderBy: { xp: 'desc' },
+    take: 10,
+    select: {
+      uuid: true,
+      username: true,
+      xp: true,
+    },
+  });
+
+  // Add rank to top 10
+  const top10WithRank = top10.map((user, index) => ({
+    ...user,
+    rank: index + 1,
+  }));
+
+  // Check if current user is in top 10
+  const isInTop10 = top10WithRank.some((user) => user.uuid === currentUserId);
+
+  let currentUserData = null;
+
+  if (!isInTop10 && currentUserId) {
+    // Get current user's data
+    const currentUser = await prisma.users.findUnique({
+      where: { uuid: currentUserId },
+      select: {
+        uuid: true,
+        username: true,
+        xp: true,
+      },
+    });
+
+    if (currentUser) {
+      // Count users with more XP to determine rank
+      const usersAbove = await prisma.users.count({
+        where: {
+          xp: { gt: currentUser.xp },
+        },
+      });
+
+      currentUserData = {
+        ...currentUser,
+        rank: usersAbove + 1,
+      };
+    }
+  }
+
+  return {
+    top10: top10WithRank,
+    currentUser: currentUserData,
+  };
+};

@@ -11,7 +11,6 @@ export const createAccessToken = (user) => {
       username: user.username,
       email: user.email,
       isAdmin: user.admin === 1,
-      role: user.user_group ? user.user_group.nev : null,
       accessedEndpoints: user.accessedEndpoints || [],
     },
     SECRET,

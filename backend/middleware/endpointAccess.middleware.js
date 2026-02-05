@@ -9,7 +9,7 @@ export default function endpointAccessMiddleware(req, res, next) {
   }
 
   // If the user is an admin
-  if (user.role === 'ADMIN') {
+  if (user.isAdmin) {
     return next();
   }
 

@@ -13,6 +13,9 @@ const LoginPage = lazy(() => import('./pages/Login'));
 const RegisterPage = lazy(() => import('./pages/Register'));
 const OnboardingPage = lazy(() => import('./pages/Onboarding'));
 const ProfilePage = lazy(() => import('./pages/Profile'));
+const LeaderboardPage = lazy(() => import('./pages/Leaderboard'));
+const ContactPage = lazy(() => import('./pages/Contact'));
+const AdminPage = lazy(() => import('./pages/Admin'));
 import Music from './components/Music';
 import SessionManager from './components/SessionManager';
 import ProtectedRoute from './guards/ProtectedRoute';
@@ -50,7 +53,7 @@ createRoot(document.getElementById('root')).render(
         <Routes>
           <Route path="/" element={<FooldalPage />} />
           <Route element={<ProtectedRoute />}>
-            {/* Ideiglenses ez lesz a neve hogy aktiv-kihivasok */}
+            <Route path="/admin" element={<AdminPage />} />
             <Route path="/aktiv-kihivasok" element={<ActiveChallengesPage />} />
             <Route
               path="/egyeni-kihivasok"
@@ -58,8 +61,10 @@ createRoot(document.getElementById('root')).render(
             />
             <Route path="/kezdeti-lepesek" element={<OnboardingPage />} />
             <Route path="/profil" element={<ProfilePage />} />
+            <Route path="/ranglista" element={<LeaderboardPage />} />
           </Route>
           <Route path="/bolt" element={<ShopPage />} />
+          <Route path="/kapcsolat" element={<ContactPage />} />
           <Route path="/bejelentkezes" element={<LoginPage />} />
           <Route path="/regisztracio" element={<RegisterPage />} />
         </Routes>

@@ -60,16 +60,6 @@ model tasks {
   @@index([updated_by], map: "tasks_ibfk_2")
 }
 
-model user_group {
-  uuid  String  @id @default(uuid()) @db.VarChar(36)
-  nev   String  @db.VarChar(128)
-  c     Boolean
-  r     Boolean
-  u     Boolean
-  d     Boolean
-  users users[]
-}
-
 model user_interests {
   uuid        String   @id @default(uuid()) @db.VarChar(36)
   user_id     String   @db.VarChar(36)
@@ -102,7 +92,7 @@ model users {
   password                                String                 @db.VarChar(255)
   xp                                      Int
   coin                                    Int
-  group_id                                String                 @db.VarChar(36)
+  admin                                   Int
   registered_at                           DateTime               @default(now()) @db.DateTime(0)
   onboarding_completed                    Boolean                @default(false)
   activity_level                          String?                @db.VarChar(20)
@@ -119,9 +109,6 @@ model users {
   user_endpoint_access                    user_endpoint_access[]
   user_shop_items                         user_shop_items[]
   user_tasks                              user_tasks[]
-  user_group                              user_group             @relation(fields: [group_id], references: [uuid], onUpdate: Restrict, map: "users_ibfk_1")
-
-  @@index([group_id], map: "group_id")
 }
 
 model shop_items {

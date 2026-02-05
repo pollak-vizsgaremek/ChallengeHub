@@ -9,6 +9,7 @@ import {
   checkUserExists,
   updateUserProfile,
   getUserPurchasedItemsWithDetails,
+  getLeaderboard,
 } from '../service/user.service.js';
 
 const router = Router();
@@ -81,11 +82,9 @@ router.post('/erdelokdes', async (req, res) => {
   const { userId, categories, activityLevel } = req.body;
 
   if (!userId || !categories || !Array.isArray(categories)) {
-    return res
-      .status(400)
-      .json({
-        message: 'Hiányzó felhasználó, kategóriák vagy aktivitási szint!',
-      });
+    return res.status(400).json({
+      message: 'Hiányzó felhasználó, kategóriák vagy aktivitási szint!',
+    });
   }
 
   try {
@@ -586,6 +585,68 @@ router.put('/interests', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/**
+ * @swagger
+ * /users/leaderboard:
+ *   get:
+ *     summary: Get leaderboard
+ *     description: Get top 10 users by XP and current user's rank if not in top 10
+ *     tags:
+ *       - User
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         description: Current user's ID to check their rank
+ *     responses:
+ *       200:
+ *         description: Leaderboard data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 top10:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       uuid:
+ *                         type: string
+ *                       username:
+ *                         type: string
+ *                       xp:
+ *                         type: integer
+ *                       rank:
+ *                         type: integer
+ *                 currentUser:
+ *                   type: object
+ *                   nullable: true
+ *                   properties:
+ *                     uuid:
+ *                       type: string
+ *                     username:
+ *                       type: string
+ *                     xp:
+ *                       type: integer
+ *                     rank:
+ *                       type: integer
+ *       500:
+ *         description: Server error
+ */
+router.get('/leaderboard', async (req, res) => {
+  const { userId } = req.query;
+
+  try {
+    const leaderboard = await getLeaderboard(userId);
+    res.status(200).json(leaderboard);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Szerver hiba!' });
   }
 });
 

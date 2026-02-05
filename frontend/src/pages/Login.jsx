@@ -63,8 +63,10 @@ const Login = () => {
           })
         );
 
-        // Redirect based on onboarding status
-        if (!data.onboardingCompleted) {
+        // Redirect based on user type and onboarding status
+        if (data.isAdmin) {
+          navigate('/admin');
+        } else if (!data.onboardingCompleted) {
           navigate('/kezdeti-lepesek');
         } else {
           navigate('/');
