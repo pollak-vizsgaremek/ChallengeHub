@@ -208,6 +208,7 @@
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
 .stat-card:hover {
@@ -224,6 +225,21 @@
   align-items: center;
   justify-content: center;
   font-size: 1.8rem;
+}
+
+.stat-icon-wrapper.users {
+  background-color: rgba(72, 52, 212, 0.125);
+  color: #4834d4;
+}
+
+.stat-icon-wrapper.views {
+  background-color: rgba(108, 92, 231, 0.125);
+  color: #6c5ce7;
+}
+
+.stat-icon-wrapper.completions {
+  background-color: rgba(241, 196, 15, 0.125);
+  color: #f1c40f;
 }
 
 .stat-info h3 {
@@ -243,11 +259,25 @@
 
 .stat-trend {
   font-size: 0.8rem;
-  color: var(--accent-green);
-  background: rgba(46, 213, 115, 0.1);
   padding: 2px 8px;
   border-radius: 10px;
   font-family: 'Inter', sans-serif;
+  font-weight: 500;
+}
+
+.stat-trend.positive {
+  color: var(--accent-green);
+  background: rgba(46, 213, 115, 0.1);
+}
+
+.stat-trend.neutral {
+  color: var(--text-gray);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.stat-trend.negative {
+  color: var(--accent-red);
+  background: rgba(255, 71, 87, 0.1);
 }
 
 /* Dashboard Widgets */
@@ -655,9 +685,9 @@
     padding: 0;
     justify-content: space-around;
     align-items: center;
-    background: var(--bg-dark); 
+    background: var(--bg-dark);
     z-index: 1000;
-    display: flex; 
+    display: flex;
   }
 
   .sidebar-header,
@@ -686,7 +716,7 @@
     height: 100%;
     flex: 1;
     text-align: center;
-    background: transparent !important; 
+    background: transparent !important;
     border: none !important;
   }
 
@@ -696,7 +726,7 @@
   }
 
   .sidebar-item span {
-    display: block; 
+    display: block;
     font-size: 0.7rem;
   }
 
@@ -708,7 +738,7 @@
   .admin-main {
     margin-left: 0;
     width: 100%;
-    padding: 1rem 1rem 5rem 1rem; 
+    padding: 1rem 1rem 5rem 1rem;
   }
 
   .mobile-header {

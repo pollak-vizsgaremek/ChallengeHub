@@ -321,6 +321,51 @@
   height: 20px;
 }
 
+/* Login Prompt */
+.login-prompt {
+  text-align: center;
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  border: 1px dashed var(--glass-border);
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.login-prompt h3 {
+  font-size: 1.8rem;
+  color: var(--text-white);
+  margin-bottom: 0.5rem;
+}
+
+.login-prompt p {
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  max-width: 600px;
+}
+
+.btn-login-prompt {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  background: var(--primary-purple);
+  color: white;
+  text-decoration: none;
+  font-family: 'Bangers', cursive;
+  font-size: 1.2rem;
+  border-radius: 12px;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+}
+
+.btn-login-prompt:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(108, 92, 231, 0.6);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .contact-card {

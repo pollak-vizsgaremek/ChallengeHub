@@ -73,6 +73,7 @@ export const register = async (username, email, password, passwordConfirm) => {
       password: encryptedPassword,
       xp: 0,
       coin: 0,
+      admin: 0,
     },
   });
 
@@ -82,6 +83,7 @@ export const register = async (username, email, password, passwordConfirm) => {
     { endpoint: '/api/v1/users/stats', methods: 'GET' },
     { endpoint: '/api/v1/categories', methods: 'POST,GET' },
     { endpoint: '/api/v1/shop', methods: 'POST,GET,PUT,DELETE' },
+    { endpoint: '/api/v1/tickets', methods: 'POST' },
   ];
 
   await Promise.all(

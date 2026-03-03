@@ -1,98 +1,96 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '../components/navbar';
-import Footer from '../components/Footer';
 import './Admin.css';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import {
   FaUsers,
   FaTasks,
+  FaEye,
   FaTrophy,
-  FaCog,
   FaSearch,
   FaTrash,
   FaEdit,
   FaEnvelope,
   FaFileExport,
 } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Mock data for design purposes
-  const stats = [
-    {
-      id: 1,
-      label: 'Összes Felhasználó',
-      value: '1,248',
-      icon: <FaUsers />,
-      color: '#4834d4',
-      trend: '+12% ezen a héten',
+  //! Ez alakítani kell
+  const [dashboardData, setDashboardData] = useState({
+    totalUsers: {
+      value: '...',
+      trend: 'Betöltés...',
+      trendDirection: 'neutral',
     },
-    {
-      id: 2,
-      label: 'Aktív Kihívások',
-      value: '85',
-      icon: <FaTasks />,
-      color: '#6c5ce7',
-      trend: '+5 új ma',
+    pageViews: {
+      value: '...',
+      trend: 'Betöltés...',
+      trendDirection: 'neutral',
     },
-    {
-      id: 3,
-      label: 'Mai Teljesítések',
-      value: '342',
-      icon: <FaTrophy />,
-      color: '#f1c40f',
-      trend: '+18% tegnaphoz képest',
+    completions: {
+      value: '...',
+      trend: 'Betöltés...',
+      trendDirection: 'neutral',
     },
-  ];
-
-  const initialUsers = [
-    {
-      id: 1,
-      name: 'Varga Máté',
-      email: 'mate@example.com',
-      role: 'Admin',
-      status: 'active',
-      avatar: 'M',
-    },
-    {
-      id: 2,
-      name: 'Kiss Péter',
-      email: 'peter@example.com',
-      role: 'User',
-      status: 'active',
-      avatar: 'P',
-    },
-    {
-      id: 3,
-      name: 'Nagy Anna',
-      email: 'anna@example.com',
-      role: 'User',
-      status: 'banned',
-      avatar: 'A',
-    },
-    {
-      id: 4,
-      name: 'Teszt Elek',
-      email: 'elek@test.com',
-      role: 'User',
-      status: 'pending',
-      avatar: 'T',
-    },
-  ];
-
-  const [users, setUsers] = useState(initialUsers);
+  });
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
-    // Simulate loading
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+
+    const fetchStats = async () => {
+      try {
+        const response = await fetch(
+          'http://localhost:3300/api/v1/admin/stats',
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          setDashboardData({
+            totalUsers: {
+              value: data.totalUsers.value,
+              trend: `${data.totalUsers.trend > 0 ? '+' : ''}${data.totalUsers.trend}% az elmúlt 7 napban`,
+              trendDirection:
+                data.totalUsers.trend > 0
+                  ? 'positive'
+                  : data.totalUsers.trend < 0
+                    ? 'negative'
+                    : 'neutral',
+            },
+            pageViews: {
+              value: '124',
+              trend: '+12% tegnaphoz képest',
+              trendDirection: 'positive',
+            },
+            completions: {
+              value: data.todayCompletions.value,
+              trend: `${data.todayCompletions.trend > 0 ? '+' : ''}${data.todayCompletions.trend}% tegnaphoz képest`,
+              trendDirection:
+                data.todayCompletions.trend > 0
+                  ? 'positive'
+                  : data.todayCompletions.trend < 0
+                    ? 'negative'
+                    : 'neutral',
+            },
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching admin stats:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStats();
   }, []);
 
   const handleSearch = (e) => {
@@ -128,29 +126,61 @@ const Admin = () => {
               Vezérlőpult Áttekintés
             </h2>
             <div className="stats-grid">
-              {stats.map((stat, index) => (
-                <div
-                  className="stat-card"
-                  key={stat.id}
-                  data-aos="zoom-in"
-                  data-aos-delay={index * 100}
-                >
-                  <div
-                    className="stat-icon-wrapper"
-                    style={{
-                      backgroundColor: `${stat.color}20`,
-                      color: stat.color,
-                    }}
-                  >
-                    {stat.icon}
-                  </div>
-                  <div className="stat-info">
-                    <h3>{stat.value}</h3>
-                    <p className="stat-label">{stat.label}</p>
-                    <span className="stat-trend">{stat.trend}</span>
-                  </div>
+              {/* Összes Felhasználó Kártya */}
+              <div className="stat-card" data-aos="zoom-in" data-aos-delay="0">
+                <div className="stat-icon-wrapper users">
+                  <FaUsers />
                 </div>
-              ))}
+                <div className="stat-info">
+                  <h3>{dashboardData.totalUsers.value}</h3>
+                  <p className="stat-label">Összes Felhasználó</p>
+                  <span
+                    className={`stat-trend ${dashboardData.totalUsers.trendDirection}`}
+                  >
+                    {dashboardData.totalUsers.trend}
+                  </span>
+                </div>
+              </div>
+
+              {/* Mai Oldal Megtekintések Kártya */}
+              <div
+                className="stat-card"
+                data-aos="zoom-in"
+                data-aos-delay="100"
+              >
+                <div className="stat-icon-wrapper views">
+                  <FaEye />
+                </div>
+                <div className="stat-info">
+                  <h3>{dashboardData.pageViews.value}</h3>
+                  <p className="stat-label">Mai oldal megtekintések</p>
+                  <span
+                    className={`stat-trend ${dashboardData.pageViews.trendDirection}`}
+                  >
+                    {dashboardData.pageViews.trend}
+                  </span>
+                </div>
+              </div>
+
+              {/* Mai Teljesítések Kártya */}
+              <div
+                className="stat-card"
+                data-aos="zoom-in"
+                data-aos-delay="200"
+              >
+                <div className="stat-icon-wrapper completions">
+                  <FaTrophy />
+                </div>
+                <div className="stat-info">
+                  <h3>{dashboardData.completions.value}</h3>
+                  <p className="stat-label">Mai Teljesítések</p>
+                  <span
+                    className={`stat-trend ${dashboardData.completions.trendDirection}`}
+                  >
+                    {dashboardData.completions.trend}
+                  </span>
+                </div>
+              </div>
             </div>
 
             <div className="dashboard-widgets">

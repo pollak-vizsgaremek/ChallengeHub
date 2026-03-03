@@ -1,22 +1,96 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import { Toaster, toast } from 'react-hot-toast';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
 import './Contact.css';
 
 const Contact = () => {
   const [activeTab, setActiveTab] = useState('contact');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const [formData, setFormData] = useState({
+    type: '',
+    title: '',
+    description: '',
+    priority: 'Közepes',
+  });
 
   useEffect(() => {
     AOS.init({
       once: true,
       duration: 1000,
     });
+
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        setIsLoggedIn(true);
+        setUserId(user.userId || user.uuid);
+      } catch (e) {
+        setIsLoggedIn(false);
+      }
+    }
   }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (
+      !formData.type ||
+      !formData.title ||
+      !formData.description ||
+      !formData.priority
+    ) {
+      toast.error('Kérlek tölts ki minden mezőt!');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3300/api/v1/tickets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: JSON.stringify({
+          ...formData,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(data.message || 'Hibajegy sikeresen létrehozva!');
+        setFormData({
+          type: '',
+          title: '',
+          description: '',
+          priority: 'Közepes',
+        });
+      } else {
+        toast.error(data.message || 'Hiba történt a beküldés során!');
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast.error('Szerver hiba! Próbáld újra később.');
+    }
+  };
 
   return (
     <>
+      <Toaster position="top-right" />
       <div className="blob blob-1"></div>
       <div className="blob blob-2"></div>
       <div className="blob blob-3"></div>
@@ -224,8 +298,8 @@ const Contact = () => {
                   </div>
                 </div>
               </div>
-            ) : (
-              <form className="bug-form" onSubmit={(e) => e.preventDefault()}>
+            ) : isLoggedIn ? (
+              <form className="bug-form" onSubmit={handleSubmit}>
                 <div
                   className="form-group"
                   data-aos="fade-up"
@@ -233,12 +307,17 @@ const Contact = () => {
                 >
                   <label className="form-label">Hiba Típusa</label>
                   <div className="input-group">
-                    <select className="modern-input form-select">
-                      <option>Válassz típust...</option>
-                      <option>Kinézeti hiba (Design)</option>
-                      <option>Működési hiba (Bug)</option>
-                      <option>Fiók probléma</option>
-                      <option>Egyéb</option>
+                    <select
+                      className="modern-input form-select"
+                      name="type"
+                      value={formData.type}
+                      onChange={handleChange}
+                    >
+                      <option value="">Válassz típust...</option>
+                      <option value="Design">Kinézeti hiba (Design)</option>
+                      <option value="Bug">Működési hiba (Bug)</option>
+                      <option value="Account">Fiók probléma</option>
+                      <option value="Other">Egyéb</option>
                     </select>
                   </div>
                 </div>
@@ -254,6 +333,9 @@ const Contact = () => {
                       type="text"
                       className="modern-input"
                       placeholder="pl. Nem tölt be a Shop oldal..."
+                      name="title"
+                      value={formData.title}
+                      onChange={handleChange}
                     />
                   </div>
                 </div>
@@ -270,6 +352,9 @@ const Contact = () => {
                     <textarea
                       className="modern-input form-textarea"
                       placeholder="Írd le pontosan hogyan jött elő a hiba..."
+                      name="description"
+                      value={formData.description}
+                      onChange={handleChange}
                     ></textarea>
                   </div>
                 </div>
@@ -281,11 +366,16 @@ const Contact = () => {
                 >
                   <label className="form-label">Sürgősség</label>
                   <div className="input-group">
-                    <select className="modern-input form-select">
-                      <option>Alacsony</option>
-                      <option>Közepes</option>
-                      <option>Magas</option>
-                      <option>Kritikus</option>
+                    <select
+                      className="modern-input form-select"
+                      name="priority"
+                      value={formData.priority}
+                      onChange={handleChange}
+                    >
+                      <option value="Alacsony">Alacsony</option>
+                      <option value="Közepes">Közepes</option>
+                      <option value="Magas">Magas</option>
+                      <option value="Kritikus">Kritikus</option>
                     </select>
                   </div>
                 </div>
@@ -312,6 +402,14 @@ const Contact = () => {
                   Beküldés
                 </button>
               </form>
+            ) : (
+              <div className="login-prompt" data-aos="fade-up">
+                <h3>Jelentkezz be a hibajegy felvételéhez!</h3>
+                <p>Csak regisztrált felhasználók küldhetnek be hibajegyet.</p>
+                <Link to="/bejelentkezes" className="btn-login-prompt">
+                  Bejelentkezés
+                </Link>
+              </div>
             )}
           </div>
         </div>

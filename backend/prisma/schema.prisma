@@ -106,6 +106,7 @@ model users {
   reviews                                 reviews[]
   tasks_tasks_created_byTousers           tasks[]                @relation("tasks_created_byTousers")
   tasks_tasks_updated_byTousers           tasks[]                @relation("tasks_updated_byTousers")
+  tickets                                 tickets[]
   user_endpoint_access                    user_endpoint_access[]
   user_shop_items                         user_shop_items[]
   user_tasks                              user_tasks[]
@@ -143,4 +144,18 @@ model user_endpoint_access {
   users    users  @relation(fields: [user_id], references: [uuid], onUpdate: Restrict, map: "user_endpoint_access_ibfk_1")
 
   @@index([user_id], map: "user_id")
+}
+
+model tickets {
+  uuid        String   @id @default(uuid()) @db.VarChar(36)
+  user_id     String   @db.VarChar(36)
+  type        String   @db.VarChar(50)
+  title       String   @db.VarChar(255)
+  description String   @db.Text
+  priority    String   @db.VarChar(20)
+  status      String   @default("open") @db.VarChar(20)
+  created_at  DateTime @default(now()) @db.DateTime(0)
+  users       users    @relation(fields: [user_id], references: [uuid], onUpdate: Restrict, map: "fk_tickets_users")
+
+  @@index([user_id], map: "idx_tickets_user_id")
 }

@@ -9,6 +9,9 @@ import userController from './controllers/user.controller.js';
 import challengesController from './controllers/challenges.controller.js';
 import shopController from './controllers/shop.controller.js';
 
+import ticketController from './controllers/ticket.controller.js';
+import adminController from './controllers/admin.controller.js';
+
 import { authMiddleware } from './middleware/auth.middleware.js';
 import endpointAccessMiddleware from './middleware/endpointAccess.middleware.js';
 
@@ -45,6 +48,8 @@ app.use(
   endpointAccessMiddleware,
   shopController
 );
+app.use('/api/v1/tickets', authMiddleware, ticketController);
+app.use('/api/v1/admin', authMiddleware, adminController);
 
 setupSwagger(app);
 

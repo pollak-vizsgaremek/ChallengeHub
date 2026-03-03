@@ -26,6 +26,7 @@ export async function authMiddleware(req, res, next) {
       id: decodedToken.id,
       email: decodedToken.email,
       role: decodedToken.role,
+      isAdmin: decodedToken.isAdmin,
       accessedEndpoints: decodedToken.accessedEndpoints || [],
     };
     req.user = user;
