@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/navbar';
 import './Admin.css';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import { toast } from 'react-hot-toast';
+import { decodeJwt } from '../utils/jwt';
 import {
   FaUsers,
   FaTasks,
@@ -13,14 +16,53 @@ import {
   FaEdit,
   FaEnvelope,
   FaFileExport,
+  FaTicketAlt,
+  FaCheck,
+  FaChevronDown,
+  FaChevronUp,
 } from 'react-icons/fa';
 
 const Admin = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [tickets, setTickets] = useState([]);
+  const [expandedTicketId, setExpandedTicketId] = useState(null);
 
-  //! Ez alakítani kell
+  // Users tab state
+  const [users, setUsers] = useState([]);
+  const [initialUsers, setInitialUsers] = useState([]);
+  const [editingUser, setEditingUser] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Challenges & Categories tab state
+  const [categories, setCategories] = useState([]);
+  const [challenges, setChallenges] = useState([]);
+
+  // Modals for Category
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [categoryForm, setCategoryForm] = useState({ name: '', type: '' });
+
+  // Modals for Challenge
+  const [isChallengeModalOpen, setIsChallengeModalOpen] = useState(false);
+  const [editingChallenge, setEditingChallenge] = useState(null);
+  const [challengeForm, setChallengeForm] = useState({
+    name: '',
+    description: '',
+    xp: '',
+    coin: '',
+    categories_id: '',
+  });
+
+  // Delete Confirmation Modal
+  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState({
+    isOpen: false,
+    type: null,
+    id: null,
+  });
+
   const [dashboardData, setDashboardData] = useState({
     totalUsers: {
       value: '...',
@@ -37,9 +79,19 @@ const Admin = () => {
       trend: 'Betöltés...',
       trendDirection: 'neutral',
     },
+    recentActivities: [],
   });
 
   useEffect(() => {
+    // Admin check
+    const token = localStorage.getItem('accessToken');
+    const decoded = decodeJwt(token);
+    if (!decoded || !decoded.isAdmin) {
+      toast.error('Hozzáférés megtagadva!');
+      navigate('/', { replace: true });
+      return;
+    }
+
     AOS.init({ duration: 800, once: true });
 
     const fetchStats = async () => {
@@ -67,9 +119,16 @@ const Admin = () => {
                     : 'neutral',
             },
             pageViews: {
-              value: '124',
-              trend: '+12% tegnaphoz képest',
-              trendDirection: 'positive',
+              value: data.pageViews?.value || 'N/A',
+              trend: data.pageViews?.trend
+                ? `${data.pageViews.trend > 0 ? '+' : ''}${data.pageViews.trend}% tegnaphoz képest`
+                : 'Adat nem elérhető',
+              trendDirection:
+                parseInt(data.pageViews?.trend || 0) > 0
+                  ? 'positive'
+                  : parseInt(data.pageViews?.trend || 0) < 0
+                    ? 'negative'
+                    : 'neutral',
             },
             completions: {
               value: data.todayCompletions.value,
@@ -81,7 +140,69 @@ const Admin = () => {
                     ? 'negative'
                     : 'neutral',
             },
+            recentActivities: data.recentActivities || [],
           });
+        }
+
+        // Fetch tickets
+        const ticketsResponse = await fetch(
+          'http://localhost:3300/api/v1/admin/tickets',
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+          }
+        );
+
+        if (ticketsResponse.ok) {
+          const ticketsData = await ticketsResponse.json();
+          setTickets(ticketsData);
+        }
+
+        // Fetch users
+        const usersResponse = await fetch(
+          'http://localhost:3300/api/v1/admin/users',
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+          }
+        );
+
+        if (usersResponse.ok) {
+          const usersData = await usersResponse.json();
+          setUsers(usersData);
+          setInitialUsers(usersData);
+        }
+
+        // Fetch categories
+        const categoriesResponse = await fetch(
+          'http://localhost:3300/api/v1/categories',
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+          }
+        );
+
+        if (categoriesResponse.ok) {
+          const categoriesData = await categoriesResponse.json();
+          setCategories(categoriesData);
+        }
+
+        // Fetch challenges
+        const challengesResponse = await fetch(
+          'http://localhost:3300/api/v1/challenges',
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+          }
+        );
+
+        if (challengesResponse.ok) {
+          const challengesData = await challengesResponse.json();
+          setChallenges(challengesData);
         }
       } catch (error) {
         console.error('Error fetching admin stats:', error);
@@ -101,11 +222,299 @@ const Admin = () => {
     } else {
       const filtered = initialUsers.filter(
         (user) =>
-          user.name.toLowerCase().includes(query) ||
+          user.username.toLowerCase().includes(query) ||
           user.email.toLowerCase().includes(query)
       );
       setUsers(filtered);
     }
+  };
+
+  const handleTicketStatusToggle = async (id, currentStatus) => {
+    const newStatus = currentStatus === 'fixed' ? 'open' : 'fixed';
+
+    try {
+      const response = await fetch(
+        `http://localhost:3300/api/v1/admin/tickets/${id}/status`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
+
+      if (response.ok) {
+        setTickets(
+          tickets.map((ticket) =>
+            ticket.uuid === id ? { ...ticket, status: newStatus } : ticket
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Hiba a hibajegy frissítésekor:', error);
+    }
+  };
+
+  const handleEditUser = (user) => {
+    setEditingUser(user);
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditingUser(null);
+  };
+
+  const handleUpdateRole = async (userId, isAdmin) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3300/api/v1/admin/users/${userId}/role`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+          body: JSON.stringify({ admin: isAdmin }),
+        }
+      );
+
+      if (response.ok) {
+        setUsers(
+          users.map((u) => (u.uuid === userId ? { ...u, admin: isAdmin } : u))
+        );
+        setEditingUser((prev) => ({ ...prev, admin: isAdmin }));
+      }
+    } catch (error) {
+      console.error('Hiba a szerepkör frissítésekor:', error);
+    }
+  };
+
+  const handleUpdateBan = async (userId, isBanned) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3300/api/v1/admin/users/${userId}/ban`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+          body: JSON.stringify({ is_banned: isBanned }),
+        }
+      );
+
+      if (response.ok) {
+        setUsers(
+          users.map((u) =>
+            u.uuid === userId ? { ...u, is_banned: isBanned } : u
+          )
+        );
+        setEditingUser((prev) => ({ ...prev, is_banned: isBanned }));
+      }
+    } catch (error) {
+      console.error('Hiba a kitiltás frissítésekor:', error);
+    }
+  };
+
+  // Category Handlers
+  const handleSaveCategory = async (e) => {
+    e.preventDefault();
+    try {
+      const isEdit = !!editingCategory;
+      const url = isEdit
+        ? `http://localhost:3300/api/v1/categories/${editingCategory.uuid}`
+        : 'http://localhost:3300/api/v1/categories';
+      const method = isEdit ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: JSON.stringify(categoryForm),
+      });
+
+      if (response.ok) {
+        const savedCategory = await response.json();
+        if (isEdit) {
+          setCategories(
+            categories.map((c) =>
+              c.uuid === savedCategory.uuid ? savedCategory : c
+            )
+          );
+        } else {
+          setCategories([...categories, savedCategory]);
+        }
+        setIsCategoryModalOpen(false);
+        setEditingCategory(null);
+        setCategoryForm({ name: '', type: '' });
+        toast.success(
+          isEdit
+            ? 'Kategória sikeresen frissítve!'
+            : 'Kategória sikeresen létrehozva!'
+        );
+      } else {
+        const err = await response.json();
+        toast.error(err.message || 'Hiba mentés során');
+      }
+    } catch (error) {
+      console.error('Hiba a kategória mentésekor:', error);
+      toast.error('Váratlan hiba történt a kategória mentésekor.');
+    }
+  };
+
+  const executeDeleteCategory = async (uuid) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3300/api/v1/categories/${uuid}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        }
+      );
+      if (response.ok) {
+        setCategories(categories.filter((c) => c.uuid !== uuid));
+        // Also remove challenges that belonged to this category
+        setChallenges(challenges.filter((ch) => ch.categories_id !== uuid));
+        toast.success(
+          'Kategória és a hozzá tartozó kihívások sikeresen törölve!'
+        );
+      } else {
+        const err = await response.json();
+        toast.error(err.message || 'Hiba törlés során');
+      }
+    } catch (error) {
+      console.error('Hiba a kategória törlésekor:', error);
+      toast.error('Váratlan hiba történt a kategória törlésekor.');
+    }
+  };
+
+  // Challenge Handlers
+  const handleSaveChallenge = async (e) => {
+    e.preventDefault();
+    try {
+      const isEdit = !!editingChallenge;
+      const url = isEdit
+        ? `http://localhost:3300/api/v1/challenges/${editingChallenge.uuid}`
+        : 'http://localhost:3300/api/v1/challenges';
+      const method = isEdit ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: JSON.stringify(challengeForm),
+      });
+
+      if (response.ok) {
+        setIsChallengeModalOpen(false);
+        setEditingChallenge(null);
+        setChallengeForm({
+          name: '',
+          description: '',
+          xp: '',
+          coin: '',
+          categories_id: '',
+        });
+
+        // Refresh full lists to include nested relationships
+        const challengesRes = await fetch(
+          'http://localhost:3300/api/v1/challenges',
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+          }
+        );
+        if (challengesRes.ok) setChallenges(await challengesRes.json());
+        toast.success(
+          isEdit
+            ? 'Kihívás sikeresen frissítve!'
+            : 'Kihívás sikeresen létrehozva!'
+        );
+      } else {
+        const err = await response.json();
+        toast.error(err.message || 'Hiba mentés során');
+      }
+    } catch (error) {
+      console.error('Hiba a kihívás mentésekor:', error);
+      toast.error('Váratlan hiba történt a kihívás mentésekor.');
+    }
+  };
+
+  const executeDeleteChallenge = async (uuid) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3300/api/v1/challenges/${uuid}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        }
+      );
+      if (response.ok) {
+        setChallenges(challenges.filter((c) => c.uuid !== uuid));
+        toast.success('Kihívás sikeresen törölve!');
+      } else {
+        const err = await response.json();
+        toast.error(err.message || 'Hiba törlés során');
+      }
+    } catch (error) {
+      console.error('Hiba a kihívás törlésekor:', error);
+      toast.error('Váratlan hiba történt a kihívás törlésekor.');
+    }
+  };
+
+  const confirmDelete = () => {
+    if (deleteConfirmDialog.type === 'category') {
+      executeDeleteCategory(deleteConfirmDialog.id);
+    } else if (deleteConfirmDialog.type === 'challenge') {
+      executeDeleteChallenge(deleteConfirmDialog.id);
+    }
+    setDeleteConfirmDialog({ isOpen: false, type: null, id: null });
+  };
+
+  const openCategoryModal = (category = null) => {
+    if (category) {
+      setEditingCategory(category);
+      setCategoryForm({ name: category.name, type: category.type });
+    } else {
+      setEditingCategory(null);
+      setCategoryForm({ name: '', type: '' });
+    }
+    setIsCategoryModalOpen(true);
+  };
+
+  const openChallengeModal = (challenge = null) => {
+    if (challenge) {
+      setEditingChallenge(challenge);
+      setChallengeForm({
+        name: challenge.name,
+        description: challenge.description,
+        xp: challenge.xp,
+        coin: challenge.coin,
+        categories_id: challenge.categories_id,
+      });
+    } else {
+      setEditingChallenge(null);
+      setChallengeForm({
+        name: '',
+        description: '',
+        xp: '',
+        coin: '',
+        categories_id: '',
+      });
+    }
+    setIsChallengeModalOpen(true);
   };
 
   const renderContent = () => {
@@ -127,7 +536,13 @@ const Admin = () => {
             </h2>
             <div className="stats-grid">
               {/* Összes Felhasználó Kártya */}
-              <div className="stat-card" data-aos="zoom-in" data-aos-delay="0">
+              <div
+                className="stat-card"
+                data-aos="zoom-in"
+                data-aos-delay="0"
+                onClick={() => setActiveTab('users')}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="stat-icon-wrapper users">
                   <FaUsers />
                 </div>
@@ -191,36 +606,48 @@ const Admin = () => {
               >
                 <h3>Legutóbbi Tevékenységek</h3>
                 <ul className="activity-list">
-                  <li className="activity-item">
-                    <span className="activity-time">10:42</span>
-                    <div className="activity-content">
-                      <strong>Varga Máté</strong> teljesítette:{' '}
-                      <em>Reggeli Futás (5km)</em>
-                    </div>
-                    <span className="activity-status success">Kész</span>
-                  </li>
-                  <li className="activity-item">
-                    <span className="activity-time">10:30</span>
-                    <div className="activity-content">
-                      Új felhasználó regisztrált: <strong>Kiss Péter</strong>
-                    </div>
-                    <span className="activity-status info">Új</span>
-                  </li>
-                  <li className="activity-item">
-                    <span className="activity-time">09:15</span>
-                    <div className="activity-content">
-                      <strong>Rendszer</strong>: Napi biztonsági mentés sikeres
-                    </div>
-                    <span className="activity-status system">System</span>
-                  </li>
-                  <li className="activity-item">
-                    <span className="activity-time">08:55</span>
-                    <div className="activity-content">
-                      <strong>Nagy Anna</strong> jelentett egy hibát:{' '}
-                      <em>Login issue</em>
-                    </div>
-                    <span className="activity-status warning">Hiba</span>
-                  </li>
+                  {dashboardData.recentActivities.length > 0 ? (
+                    dashboardData.recentActivities.map((activity) => {
+                      const dateObj = new Date(activity.timestamp);
+                      const timeString = dateObj.toLocaleString('hu-HU', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      });
+
+                      const handleActivityClick = () => {
+                        if (activity.type === 'TICKET_CREATED') {
+                          setActiveTab('tickets');
+                        }
+                      };
+
+                      return (
+                        <li
+                          key={activity.id}
+                          className={`activity-item ${activity.type === 'TICKET_CREATED' ? 'clickable' : ''}`}
+                          onClick={handleActivityClick}
+                          style={
+                            activity.type === 'TICKET_CREATED'
+                              ? { cursor: 'pointer' }
+                              : {}
+                          }
+                        >
+                          <span className="activity-time">{timeString}</span>
+                          <div className="activity-content">
+                            {activity.content}
+                          </div>
+                          <span
+                            className={`activity-status ${activity.statusClass}`}
+                          >
+                            {activity.status}
+                          </span>
+                        </li>
+                      );
+                    })
+                  ) : (
+                    <li className="activity-item">Nincs friss tevékenység.</li>
+                  )}
                 </ul>
               </div>
 
@@ -277,57 +704,69 @@ const Admin = () => {
                 </thead>
                 <tbody>
                   {users.length > 0 ? (
-                    users.map((user, index) => (
-                      <tr
-                        key={user.id}
-                        data-aos="fade-up"
-                        //! egyenlőre csak 50 emberik megy a aos!!
-                        data-aos-delay={index * 50}
-                      >
-                        <td>
-                          <div className="user-cell">
-                            <div className="user-avatar">{user.avatar}</div>
-                            <div className="user-details">
-                              <span className="user-name">{user.name}</span>
-                              <span className="user-email">{user.email}</span>
+                    users.map((user, index) => {
+                      const role = user.admin ? 'Admin' : 'User';
+                      const status = user.is_banned ? 'banned' : 'active';
+                      const statusDisplay = user.is_banned
+                        ? 'Kitiltva'
+                        : 'Aktív';
+                      const avatarLetter = user.username
+                        ? user.username.charAt(0).toUpperCase()
+                        : '?';
+
+                      return (
+                        <tr
+                          key={user.uuid}
+                          data-aos="fade-up"
+                          data-aos-delay={index * 50}
+                        >
+                          <td data-label="Felhasználó">
+                            <div className="user-cell">
+                              <div className="user-avatar">{avatarLetter}</div>
+                              <div className="user-details">
+                                <span className="user-name">
+                                  {user.username}
+                                </span>
+                                <span className="user-email">{user.email}</span>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td>
-                          <span
-                            className={`role-badge ${user.role.toLowerCase()}`}
-                          >
-                            {user.role}
-                          </span>
-                        </td>
-                        <td>
-                          <span className={`status-dot ${user.status}`}></span>
-                          {user.status.charAt(0).toUpperCase() +
-                            user.status.slice(1)}
-                        </td>
-                        <td>
-                          <div className="action-buttons">
-                            <button
-                              className="btn-icon edit"
-                              onClick={() => handleEditUser(user.id)}
-                              title="Szerkesztés"
+                          </td>
+                          <td data-label="Szerepkör">
+                            <span
+                              className={`role-badge ${role.toLowerCase()}`}
                             >
-                              <FaEdit />
-                            </button>
-                            <button
-                              className="btn-icon delete"
-                              onClick={() => handleDeleteUser(user.id)}
-                              title="Törlés"
-                            >
-                              <FaTrash />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
+                              {role}
+                            </span>
+                          </td>
+                          <td data-label="Státusz">
+                            <span className={`status-dot ${status}`}></span>
+                            {statusDisplay}
+                          </td>
+                          <td data-label="Műveletek">
+                            <div className="action-buttons">
+                              <button
+                                className="btn-icon edit"
+                                onClick={() => handleEditUser(user)}
+                                title="Jogosultságok Szerkesztése"
+                              >
+                                <FaEdit />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
                   ) : (
                     <tr>
-                      <td colSpan="4" className="no-results">
+                      <td
+                        colSpan="4"
+                        className="no-results"
+                        style={{
+                          textAlign: 'center',
+                          padding: '2rem',
+                          color: 'var(--text-muted)',
+                        }}
+                      >
                         Nincs találat a keresésre.
                       </td>
                     </tr>
@@ -342,8 +781,302 @@ const Admin = () => {
         return (
           <div className="tab-content challenges-tab">
             <h2 className="tab-title" data-aos="fade-down">
-              Kihívások Kezelése
+              Kihívások és Kategóriák Kezelése
             </h2>
+
+            <div className="challenges-grid">
+              {/* Categories Section */}
+              <div className="admin-section" data-aos="fade-up">
+                <div className="section-header">
+                  <h3>Kategóriák</h3>
+                  <button
+                    className="btn-primary"
+                    onClick={() => openCategoryModal()}
+                  >
+                    Új Kategória
+                  </button>
+                </div>
+                <div className="table-responsive">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Név</th>
+                        <th>Típus</th>
+                        <th>Műveletek</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {categories.map((cat) => {
+                        const isAktív = cat.type.toLowerCase() === 'aktív';
+                        const isEgyéni = cat.type.toLowerCase() === 'egyéni';
+                        const badgeColor = isAktív
+                          ? 'var(--accent-green)'
+                          : isEgyéni
+                            ? 'var(--accent-red)'
+                            : 'var(--text-gray)';
+                        const badgeBg = isAktív
+                          ? 'rgba(46, 213, 115, 0.2)'
+                          : isEgyéni
+                            ? 'rgba(255, 71, 87, 0.2)'
+                            : 'rgba(255, 255, 255, 0.1)';
+                        const badgeBorder = isAktív
+                          ? '1px solid rgba(46, 213, 115, 0.3)'
+                          : isEgyéni
+                            ? '1px solid rgba(255, 71, 87, 0.3)'
+                            : '1px solid rgba(255, 255, 255, 0.2)';
+
+                        return (
+                          <tr key={cat.uuid}>
+                            <td data-label="Név">{cat.name}</td>
+                            <td data-label="Típus">
+                              <span
+                                className="role-badge"
+                                style={{
+                                  background: badgeBg,
+                                  color: badgeColor,
+                                  border: badgeBorder,
+                                }}
+                              >
+                                {cat.type}
+                              </span>
+                            </td>
+                            <td data-label="Műveletek">
+                              <div className="action-buttons">
+                                <button
+                                  className="btn-icon edit"
+                                  onClick={() => openCategoryModal(cat)}
+                                >
+                                  <FaEdit />
+                                </button>
+                                <button
+                                  className="btn-icon delete"
+                                  onClick={() =>
+                                    setDeleteConfirmDialog({
+                                      isOpen: true,
+                                      type: 'category',
+                                      id: cat.uuid,
+                                    })
+                                  }
+                                >
+                                  <FaTrash />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      {categories.length === 0 && (
+                        <tr>
+                          <td colSpan="3" className="no-results">
+                            Nincsenek kategóriák.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Challenges Section */}
+              <div
+                className="admin-section"
+                data-aos="fade-up"
+                data-aos-delay="100"
+              >
+                <div className="section-header">
+                  <h3>Kihívások</h3>
+                  <button
+                    className="btn-primary"
+                    onClick={() => openChallengeModal()}
+                  >
+                    Új Kihívás
+                  </button>
+                </div>
+                <div className="table-responsive">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Név</th>
+                        <th>Kategória</th>
+                        <th>Jutalom</th>
+                        <th>Műveletek</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {challenges.map((challenge) => (
+                        <tr key={challenge.uuid}>
+                          <td data-label="Kihívás">
+                            <div className="user-cell">
+                              <div className="user-details">
+                                <span className="user-name">
+                                  {challenge.name}
+                                </span>
+                                <span
+                                  className="user-email"
+                                  style={{
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    maxWidth: '200px',
+                                  }}
+                                >
+                                  {challenge.description}
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+                          <td data-label="Kategória">
+                            {challenge.categories?.name || 'Ismeretlen'}
+                          </td>
+                          <td data-label="Jutalom">
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                              <span
+                                style={{ color: '#ffaa00', fontWeight: 'bold' }}
+                              >
+                                {challenge.coin} Coin
+                              </span>
+                              <span
+                                style={{ color: '#00ccff', fontWeight: 'bold' }}
+                              >
+                                {challenge.xp} XP
+                              </span>
+                            </div>
+                          </td>
+                          <td data-label="Műveletek">
+                            <div className="action-buttons">
+                              <button
+                                className="btn-icon edit"
+                                onClick={() => openChallengeModal(challenge)}
+                              >
+                                <FaEdit />
+                              </button>
+                              <button
+                                className="btn-icon delete"
+                                onClick={() =>
+                                  setDeleteConfirmDialog({
+                                    isOpen: true,
+                                    type: 'challenge',
+                                    id: challenge.uuid,
+                                  })
+                                }
+                              >
+                                <FaTrash />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {challenges.length === 0 && (
+                        <tr>
+                          <td colSpan="4" className="no-results">
+                            Nincsenek kihívások.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'tickets':
+        return (
+          <div className="tab-content tickets-tab">
+            <div className="tab-header" data-aos="fade-down">
+              <h2>Hibajegyek Kezelése</h2>
+            </div>
+
+            <div className="tickets-list" data-aos="fade-up">
+              {tickets.length > 0 ? (
+                tickets.map((ticket, index) => (
+                  <div
+                    key={ticket.uuid}
+                    className="ticket-card"
+                    data-status={ticket.status}
+                    data-aos="fade-up"
+                    data-aos-delay={index * 50}
+                  >
+                    <div
+                      className="ticket-header"
+                      onClick={() =>
+                        setExpandedTicketId(
+                          expandedTicketId === ticket.uuid ? null : ticket.uuid
+                        )
+                      }
+                    >
+                      <div className="ticket-info">
+                        <span className="ticket-id">
+                          #{ticket.uuid.substring(0, 8)}
+                        </span>
+                        <h4 className="ticket-title">{ticket.title}</h4>
+                        <span className="ticket-user">
+                          Beküldte: {ticket.users.username}
+                        </span>
+                        <span className="ticket-date">
+                          {new Date(ticket.created_at).toLocaleString('hu-HU', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                      </div>
+                      <div className="ticket-actions">
+                        <span className={`status-badge ${ticket.status}`}>
+                          {ticket.status === 'fixed'
+                            ? 'Javítva'
+                            : ticket.status === 'open'
+                              ? 'Nyitva'
+                              : ticket.status}
+                        </span>
+                        {expandedTicketId === ticket.uuid ? (
+                          <FaChevronUp />
+                        ) : (
+                          <FaChevronDown />
+                        )}
+                      </div>
+                    </div>
+
+                    {expandedTicketId === ticket.uuid && (
+                      <div className="ticket-body">
+                        <div className="ticket-description">
+                          <strong>Leírás:</strong>
+                          <p>{ticket.description}</p>
+                        </div>
+                        <div className="ticket-controls">
+                          <button
+                            className={`btn-toggle-status ${ticket.status === 'fixed' ? 'fixed-btn' : ''}`}
+                            onClick={() =>
+                              handleTicketStatusToggle(
+                                ticket.uuid,
+                                ticket.status
+                              )
+                            }
+                          >
+                            {ticket.status === 'fixed' ? (
+                              <>
+                                <FaCheck /> Visszanyitás
+                              </>
+                            ) : (
+                              <>
+                                <FaCheck /> Megjelölés Javítvaként
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="no-tickets">
+                  <FaTicketAlt className="empty-state-icon" />
+                  <p>Nincsenek hibajegyek a rendszerben.</p>
+                </div>
+              )}
+            </div>
           </div>
         );
 
@@ -364,8 +1097,8 @@ const Admin = () => {
         {/* Sidebar */}
         <aside className="admin-sidebar" data-aos="fade-right">
           <div className="sidebar-header">
-            <div className="admin-logo">AdminPanel</div>
-            <p className="admin-subtitle">Menedzsment</p>
+            <h1 className="admin-logo">ChallengeHub</h1>
+            <span className="admin-subtitle">Vezérlőpult</span>
           </div>
 
           <nav className="sidebar-menu">
@@ -373,7 +1106,7 @@ const Admin = () => {
               className={`sidebar-item ${activeTab === 'overview' ? 'active' : ''}`}
               onClick={() => setActiveTab('overview')}
             >
-              <FaTrophy className="menu-icon" />
+              <FaEye className="menu-icon" />
               <span>Áttekintés</span>
             </button>
             <button
@@ -390,14 +1123,21 @@ const Admin = () => {
               <FaTasks className="menu-icon" />
               <span>Kihívások</span>
             </button>
+            <button
+              className={`sidebar-item ${activeTab === 'tickets' ? 'active' : ''}`}
+              onClick={() => setActiveTab('tickets')}
+            >
+              <FaTicketAlt className="menu-icon" />
+              <span>Hibajegyek</span>
+            </button>
           </nav>
 
           <div className="sidebar-footer">
             <div className="admin-profile">
               <div className="admin-avatar">A</div>
               <div className="admin-info">
-                <span className="name">Admin User</span>
-                <span className="role">Super Admin</span>
+                <span className="name">Admin</span>
+                <span className="role">Rendszergazda</span>
               </div>
             </div>
           </div>
@@ -405,11 +1145,327 @@ const Admin = () => {
 
         {/* Main Content */}
         <main className="admin-main">
-          <header className="mobile-header">
-            <h2>Admin Panel</h2>
-          </header>
-
+          <h1 className="mobile-header">Vezérlőpult</h1>
           {renderContent()}
+
+          {/* User Edit Modal */}
+          {isEditModalOpen && editingUser && (
+            <div className="modal-overlay" onClick={closeEditModal}>
+              <div
+                className="modal-content"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="modal-header">
+                  <h3>Felhasználó Szerkesztése: {editingUser.username}</h3>
+                  <button className="close-btn" onClick={closeEditModal}>
+                    &times;
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <div className="setting-row">
+                    <label>E-mail Cím:</label>
+                    <input type="text" value={editingUser.email} disabled />
+                  </div>
+                  <div className="setting-row toggle-row">
+                    <label>Adminisztrátori Jogosultság:</label>
+                    <button
+                      className={`toggle-btn ${editingUser.admin ? 'active' : ''}`}
+                      onClick={() =>
+                        handleUpdateRole(
+                          editingUser.uuid,
+                          editingUser.admin === 1 ? 0 : 1
+                        )
+                      }
+                    >
+                      {editingUser.admin
+                        ? 'Igen (Lefokozás)'
+                        : 'Nem (Előléptetés)'}
+                    </button>
+                  </div>
+                  <div className="setting-row toggle-row">
+                    <label>Kitiltás (Ban) Státusz:</label>
+                    <button
+                      className={`toggle-btn danger ${editingUser.is_banned ? 'active' : ''}`}
+                      onClick={() =>
+                        handleUpdateBan(
+                          editingUser.uuid,
+                          !editingUser.is_banned
+                        )
+                      }
+                    >
+                      {editingUser.is_banned
+                        ? 'Kitiltva (Visszaenged)'
+                        : 'Aktív (Kitiltás)'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Category Edit Modal */}
+          {isCategoryModalOpen && (
+            <div
+              className="modal-overlay"
+              onClick={() => setIsCategoryModalOpen(false)}
+            >
+              <div
+                className="modal-content"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="modal-header">
+                  <h3>
+                    {editingCategory
+                      ? 'Kategória Szerkesztése'
+                      : 'Új Kategória'}
+                  </h3>
+                  <button
+                    className="close-btn"
+                    onClick={() => setIsCategoryModalOpen(false)}
+                  >
+                    &times;
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <form onSubmit={handleSaveCategory} className="admin-form">
+                    <div className="form-group">
+                      <label>Kategória Neve</label>
+                      <input
+                        type="text"
+                        value={categoryForm.name}
+                        onChange={(e) =>
+                          setCategoryForm({
+                            ...categoryForm,
+                            name: e.target.value,
+                          })
+                        }
+                        required
+                        placeholder="Pl. Napi séta"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Típus</label>
+                      <input
+                        type="text"
+                        value={categoryForm.type}
+                        onChange={(e) =>
+                          setCategoryForm({
+                            ...categoryForm,
+                            type: e.target.value,
+                          })
+                        }
+                        required
+                        placeholder="Pl. sport, health, stb."
+                      />
+                    </div>
+                    <div className="modal-actions">
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        onClick={() => setIsCategoryModalOpen(false)}
+                      >
+                        Mégse
+                      </button>
+                      <button type="submit" className="btn-primary">
+                        Mentés
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Challenge Edit Modal */}
+          {isChallengeModalOpen && (
+            <div
+              className="modal-overlay"
+              onClick={() => setIsChallengeModalOpen(false)}
+            >
+              <div
+                className="modal-content"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="modal-header">
+                  <h3>
+                    {editingChallenge ? 'Kihívás Szerkesztése' : 'Új Kihívás'}
+                  </h3>
+                  <button
+                    className="close-btn"
+                    onClick={() => setIsChallengeModalOpen(false)}
+                  >
+                    &times;
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <form onSubmit={handleSaveChallenge} className="admin-form">
+                    <div className="form-group">
+                      <label>Kihívás Neve</label>
+                      <input
+                        type="text"
+                        value={challengeForm.name}
+                        onChange={(e) =>
+                          setChallengeForm({
+                            ...challengeForm,
+                            name: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Leírás</label>
+                      <textarea
+                        value={challengeForm.description}
+                        onChange={(e) =>
+                          setChallengeForm({
+                            ...challengeForm,
+                            description: e.target.value,
+                          })
+                        }
+                        required
+                        rows="3"
+                      ></textarea>
+                    </div>
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label>XP Jutalom</label>
+                        <input
+                          type="number"
+                          value={challengeForm.xp}
+                          onChange={(e) =>
+                            setChallengeForm({
+                              ...challengeForm,
+                              xp: e.target.value,
+                            })
+                          }
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Coin Jutalom</label>
+                        <input
+                          type="number"
+                          value={challengeForm.coin}
+                          onChange={(e) =>
+                            setChallengeForm({
+                              ...challengeForm,
+                              coin: e.target.value,
+                            })
+                          }
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <label>Kategória</label>
+                      <select
+                        value={challengeForm.categories_id}
+                        onChange={(e) =>
+                          setChallengeForm({
+                            ...challengeForm,
+                            categories_id: e.target.value,
+                          })
+                        }
+                        required
+                      >
+                        <option value="">-- Válassz Kategóriát --</option>
+                        {categories.map((c) => (
+                          <option key={c.uuid} value={c.uuid}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="modal-actions">
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        onClick={() => setIsChallengeModalOpen(false)}
+                      >
+                        Mégse
+                      </button>
+                      <button type="submit" className="btn-primary">
+                        Mentés
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Delete Confirm Modal */}
+          {deleteConfirmDialog.isOpen && (
+            <div
+              className="modal-overlay"
+              onClick={() =>
+                setDeleteConfirmDialog({ isOpen: false, type: null, id: null })
+              }
+            >
+              <div
+                className="modal-content delete-confirm-modal"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  className="close-btn delete-close-btn"
+                  onClick={() =>
+                    setDeleteConfirmDialog({
+                      isOpen: false,
+                      type: null,
+                      id: null,
+                    })
+                  }
+                >
+                  &times;
+                </button>
+                <div className="delete-modal-body">
+                  <div className="delete-icon-wrapper">
+                    <FaTrash className="delete-icon" />
+                  </div>
+                  <h3 className="delete-title">Törlés megerősítése</h3>
+                  <p className="delete-message">
+                    Biztosan törölni szeretnéd ezt a{' '}
+                    {deleteConfirmDialog.type === 'category'
+                      ? 'kategóriát'
+                      : 'kihívást'}
+                    ?
+                  </p>
+                  {deleteConfirmDialog.type === 'category' && (
+                    <p className="delete-warning">
+                      ⚠️ A kategóriához tartozó összes kihívás is törlésre
+                      kerül!
+                    </p>
+                  )}
+                  <p className="delete-subtitle">
+                    Ez a művelet végleges és nem vonható vissza.
+                  </p>
+                  <div className="delete-actions">
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      onClick={() =>
+                        setDeleteConfirmDialog({
+                          isOpen: false,
+                          type: null,
+                          id: null,
+                        })
+                      }
+                    >
+                      Mégse
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-delete"
+                      onClick={confirmDelete}
+                    >
+                      Törlés
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </main>
       </div>
     </div>

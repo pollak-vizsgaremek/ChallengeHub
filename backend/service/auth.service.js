@@ -19,6 +19,11 @@ export const login = async (username, password) => {
     return -1;
   }
 
+  // Ban check
+  if (user.is_banned) {
+    return -2;
+  }
+
   // Password check
   const passwordMatched = bcrypt.compareSync(password, user.password);
 

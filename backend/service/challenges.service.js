@@ -16,6 +16,43 @@ export const getAllChallenges = async () => {
   });
 };
 
+// Create challenge
+export const createChallenge = async (data, userId) => {
+  return await prisma.tasks.create({
+    data: {
+      name: data.name,
+      description: data.description,
+      xp: data.xp,
+      coin: data.coin,
+      categories_id: data.categories_id,
+      created_by: userId,
+    },
+  });
+};
+
+// Update challenge
+export const updateChallenge = async (uuid, data, userId) => {
+  return await prisma.tasks.update({
+    where: { uuid },
+    data: {
+      name: data.name,
+      description: data.description,
+      xp: data.xp,
+      coin: data.coin,
+      categories_id: data.categories_id,
+      updated_by: userId,
+      updated_at: new Date(),
+    },
+  });
+};
+
+// Delete challenge
+export const deleteChallenge = async (uuid) => {
+  return await prisma.tasks.delete({
+    where: { uuid },
+  });
+};
+
 // Get daily challenges
 export const getDailyChallenges = async (userId, type) => {
   // Get user details

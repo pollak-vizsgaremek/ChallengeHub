@@ -136,9 +136,14 @@ router.post('/bejelentkezes', async (req, res) => {
     console.warn('Captcha validation failed or skipped');
   }
 
-  // Attempt login
   try {
     const data = await login(username, password);
+
+    if (data === -2) {
+      return res
+        .status(403)
+        .json({ message: 'A fiókod ki lett tiltva a rendszerről!' });
+    }
 
     if (!data || data === -1) {
       return res

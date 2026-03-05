@@ -1,8 +1,4 @@
 1. Reszponívitás javítása minden oldalon
-2. Adatbázisba + xp és coin kell a felhasználónak és a tasknak 
-3. Üzlet oldalon ckéen a kérdőjelek helyére kép vagy ikonok. 
-4. Valahogy majd megkekll csinálnunk h a bolt oldalon h avesz valami akkor úgy tudja magát desginelni
-5. Mindenhol ahol idegilenes alert van azt cserélni toastra!
 6. env fálj törlése githubról!
 7. FONTOS az összes swaggert átkell nézni mert az adatok nem valósak egyenlőre pl user id!
 

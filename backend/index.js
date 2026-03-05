@@ -14,6 +14,7 @@ import adminController from './controllers/admin.controller.js';
 
 import { authMiddleware } from './middleware/auth.middleware.js';
 import endpointAccessMiddleware from './middleware/endpointAccess.middleware.js';
+import { adminMiddleware } from './middleware/admin.middleware.js';
 
 const app = express();
 
@@ -49,7 +50,7 @@ app.use(
   shopController
 );
 app.use('/api/v1/tickets', authMiddleware, ticketController);
-app.use('/api/v1/admin', authMiddleware, adminController);
+app.use('/api/v1/admin', authMiddleware, adminMiddleware, adminController);
 
 setupSwagger(app);
 
