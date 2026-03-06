@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import { FaCheckCircle, FaCamera, FaRunning } from 'react-icons/fa';
+import { HiSparkles } from 'react-icons/hi';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
 import InterestsCTA from '../components/InterestsCTA';
+import ChallengeProofModal from '../components/ChallengeProofModal';
 import './ActiveChallenges.css';
 
 const ActiveChallenges = () => {
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [requiredCount, setRequiredCount] = useState(0);
+  const [completedTotal, setCompletedTotal] = useState(0);
+  const [proofModal, setProofModal] = useState(null);
   useEffect(() => {
     AOS.init({
       once: true,
@@ -29,13 +35,21 @@ const ActiveChallenges = () => {
         return;
       }
       const user = JSON.parse(userStr);
+      const token = localStorage.getItem('accessToken');
 
       const response = await fetch(
-        `http://localhost:3300/api/v1/challenges/daily?userId=${user.userId}&type=active`
+        `http://localhost:3300/api/v1/challenges/daily?userId=${user.userId}&type=active`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       if (response.ok) {
         const data = await response.json();
-        setChallenges(data);
+        setChallenges(data.challenges || []);
+        setRequiredCount(data.requiredCount || 0);
+        setCompletedTotal(data.completedTotal || 0);
       } else {
         console.error(
           'Failed to fetch challenges:',
@@ -156,12 +170,24 @@ const ActiveChallenges = () => {
             Aktív <span style={{ color: 'var(--accent-red)' }}>Kihívások</span>
           </h1>
           <div className="active-hero-subtitle">Mozogj. Küzdj. Győzz.</div>
+          {requiredCount > 0 && (
+            <div className="daily-progress-info">
+              <FaCheckCircle style={{ color: '#4caf50', marginRight: '6px' }} />{' '}
+              Napi cél: teljesíts <strong>{requiredCount}</strong> kihívást
+              (bármelyik típusból)
+              <span className="daily-progress-count">
+                {completedTotal} / {requiredCount} kész
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="active-challenges-grid">
           {challenges.length === 0 ? (
             <div className="active-empty-state" data-aos="fade-up">
-              <div className="active-empty-icon">🏃‍♂️</div>
+              <div className="active-empty-icon">
+                <FaRunning />
+              </div>
               <h3>Nincs aktív kihívásod mára</h3>
               <p>
                 Úgy tűnik, mára nincs elérhető feladat. Lehet, hogy nem
@@ -174,7 +200,7 @@ const ActiveChallenges = () => {
             challenges.map((challenge, index) => (
               <div
                 key={challenge.uuid || index}
-                className="active-challenge-card"
+                className={`active-challenge-card ${challenge.user_task_status === 1 ? 'challenge-completed' : ''}`}
                 data-aos="fade-up"
                 data-aos-delay={index * 100}
               >
@@ -191,29 +217,54 @@ const ActiveChallenges = () => {
                       <span className="active-coin-icon-small">🪙</span>
                       <span>+{challenge.coin}</span>
                     </div>
-                    <span className="active-meta-chip difficulty">
-                      {challenge.difficulty}
+                    <span
+                      className={`active-meta-chip difficulty difficulty-${challenge.difficulty || 'medium'}`}
+                    >
+                      {challenge.difficulty === 'easy'
+                        ? 'Könnyű'
+                        : challenge.difficulty === 'hard'
+                          ? 'Nehéz'
+                          : 'Közepes'}
                     </span>
                   </div>
                   <p className="active-challenge-desc">
                     {challenge.description}
                   </p>
                 </div>
-                <button className="active-btn-accept">
-                  <span>Elfogadom</span>
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                {challenge.user_task_status === 1 ? (
+                  <div className="active-btn-completed">
+                    <span>
+                      <FaCheckCircle style={{ marginRight: '4px' }} />{' '}
+                      Teljesítve
+                    </span>
+                  </div>
+                ) : (
+                  <button
+                    className="active-btn-accept"
+                    onClick={() =>
+                      setProofModal({
+                        challenge,
+                        userTaskId: challenge.user_task_id,
+                      })
+                    }
                   >
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                </button>
+                    <span>
+                      <FaCamera style={{ marginRight: '4px' }} /> Bizonyíték
+                    </span>
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </button>
+                )}
               </div>
             ))
           )}
@@ -222,6 +273,26 @@ const ActiveChallenges = () => {
 
       <InterestsCTA />
       <Footer />
+
+      {/* AI Proof Validation Modal */}
+      {proofModal && (
+        <ChallengeProofModal
+          challenge={proofModal.challenge}
+          userTaskId={proofModal.userTaskId}
+          onClose={() => setProofModal(null)}
+          onSuccess={(data) => {
+            // Frissítsük a kihívás állapotát a listában
+            setChallenges((prev) =>
+              prev.map((c) =>
+                c.user_task_id === proofModal.userTaskId
+                  ? { ...c, user_task_status: 1 }
+                  : c
+              )
+            );
+            setProofModal(null);
+          }}
+        />
+      )}
     </>
   );
 };

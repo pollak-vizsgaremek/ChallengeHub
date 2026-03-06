@@ -1,6 +1,9 @@
 import 'dotenv/config';
 import cors from 'cors';
 import express from 'express';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import { setupSwagger } from './config/swagger.js';
 
 import authController from './controllers/auth.controller.js';
@@ -16,6 +19,15 @@ import { authMiddleware } from './middleware/auth.middleware.js';
 import endpointAccessMiddleware from './middleware/endpointAccess.middleware.js';
 import { adminMiddleware } from './middleware/admin.middleware.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Uploads mappa létrehozása ha nem létezik
+const uploadsDir = path.join(__dirname, 'uploads', 'proofs');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 const app = express();
 
 const corsOptions = {
@@ -24,6 +36,10 @@ const corsOptions = {
 
 app.use(express.json());
 app.use(cors(corsOptions));
+
+// Statikus fájlok kiszolgálása (feltöltött képek)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use('/api/v1/auth', authController);
 app.use(
   '/api/v1/categories',

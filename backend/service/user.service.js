@@ -1,6 +1,7 @@
 import { PrismaClient } from '../generated/prisma/client.js';
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
+import { getRequiredCount } from './challenges.service.js';
 
 const prisma = new PrismaClient();
 
@@ -93,6 +94,7 @@ export const getUserStats = async (userId) => {
       current_streak: true,
       longest_streak: true,
       last_completed_at: true,
+      activity_level: true,
     },
   });
 
@@ -102,24 +104,33 @@ export const getUserStats = async (userId) => {
 
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
 
-  let completedToday = false;
-  if (user.last_completed_at) {
-    const lastDate = new Date(user.last_completed_at);
-    const lastDateMidnight = new Date(
-      lastDate.getFullYear(),
-      lastDate.getMonth(),
-      lastDate.getDate()
-    );
-    if (lastDateMidnight.getTime() === today.getTime()) {
-      completedToday = true;
-    }
-  }
+  // Today's completed tasks
+  const todayTasks = await prisma.user_tasks.findMany({
+    where: {
+      user_id: userId,
+      created_at: {
+        gte: today,
+        lt: tomorrow,
+      },
+    },
+  });
+
+  // Determine required count based on activity level
+  const requiredCount = getRequiredCount(user.activity_level);
+  const completedCount = todayTasks.filter((t) => t.status === 1).length;
+  const completedToday =
+    completedCount >= requiredCount && todayTasks.length > 0;
 
   return {
     currentStreak: user.current_streak || 0,
     longestStreak: user.longest_streak || 0,
     completedToday,
+    completedCount,
+    requiredCount,
+    totalCount: todayTasks.length,
   };
 };
 

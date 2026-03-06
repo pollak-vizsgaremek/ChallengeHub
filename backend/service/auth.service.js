@@ -87,6 +87,7 @@ export const register = async (username, email, password, passwordConfirm) => {
     { endpoint: '/api/v1/users', methods: 'POST,GET,PUT' },
     { endpoint: '/api/v1/users/stats', methods: 'GET' },
     { endpoint: '/api/v1/categories', methods: 'POST,GET' },
+    { endpoint: '/api/v1/challenges', methods: 'POST,GET' },
     { endpoint: '/api/v1/shop', methods: 'POST,GET,PUT,DELETE' },
     { endpoint: '/api/v1/tickets', methods: 'POST' },
   ];

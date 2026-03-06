@@ -53,6 +53,7 @@ const Admin = () => {
     description: '',
     xp: '',
     coin: '',
+    difficulty: 'medium',
     categories_id: '',
   });
 
@@ -422,6 +423,7 @@ const Admin = () => {
           description: '',
           xp: '',
           coin: '',
+          difficulty: 'medium',
           categories_id: '',
         });
 
@@ -502,6 +504,7 @@ const Admin = () => {
         description: challenge.description,
         xp: challenge.xp,
         coin: challenge.coin,
+        difficulty: challenge.difficulty || 'medium',
         categories_id: challenge.categories_id,
       });
     } else {
@@ -511,6 +514,7 @@ const Admin = () => {
         description: '',
         xp: '',
         coin: '',
+        difficulty: 'medium',
         categories_id: '',
       });
     }
@@ -898,6 +902,7 @@ const Admin = () => {
                       <tr>
                         <th>Név</th>
                         <th>Kategória</th>
+                        <th>Nehézség</th>
                         <th>Jutalom</th>
                         <th>Műveletek</th>
                       </tr>
@@ -927,6 +932,17 @@ const Admin = () => {
                           </td>
                           <td data-label="Kategória">
                             {challenge.categories?.name || 'Ismeretlen'}
+                          </td>
+                          <td data-label="Nehézség">
+                            <span
+                              className={`difficulty-badge difficulty-${challenge.difficulty || 'medium'}`}
+                            >
+                              {challenge.difficulty === 'easy'
+                                ? 'Könnyű'
+                                : challenge.difficulty === 'hard'
+                                  ? 'Nehéz'
+                                  : 'Közepes'}
+                            </span>
                           </td>
                           <td data-label="Jutalom">
                             <div style={{ display: 'flex', gap: '10px' }}>
@@ -968,7 +984,7 @@ const Admin = () => {
                       ))}
                       {challenges.length === 0 && (
                         <tr>
-                          <td colSpan="4" className="no-results">
+                          <td colSpan="5" className="no-results">
                             Nincsenek kihívások.
                           </td>
                         </tr>
@@ -1356,6 +1372,23 @@ const Admin = () => {
                           required
                         />
                       </div>
+                    </div>
+                    <div className="form-group">
+                      <label>Nehézség</label>
+                      <select
+                        value={challengeForm.difficulty}
+                        onChange={(e) =>
+                          setChallengeForm({
+                            ...challengeForm,
+                            difficulty: e.target.value,
+                          })
+                        }
+                        required
+                      >
+                        <option value="easy">Könnyű</option>
+                        <option value="medium">Közepes</option>
+                        <option value="hard">Nehéz</option>
+                      </select>
                     </div>
                     <div className="form-group">
                       <label>Kategória</label>

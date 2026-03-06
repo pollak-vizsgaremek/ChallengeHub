@@ -1,4 +1,27 @@
 /* Custom Challenges Page */
+.daily-progress-info {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.daily-progress-count {
+  background: linear-gradient(135deg, var(--accent-red), var(--accent-green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
 .custom-challenges-container {
   padding-top: 120px;
   min-height: 100vh;
@@ -218,8 +241,23 @@
 }
 
 .custom-meta-chip.difficulty {
-  color: var(--gradient-blue);
-  background: rgba(116, 185, 255, 0.15);
+  color: #2196f3;
+  background: rgba(33, 150, 243, 0.15);
+}
+
+.custom-meta-chip.difficulty.difficulty-easy {
+  color: #4caf50;
+  background: rgba(76, 175, 80, 0.15);
+}
+
+.custom-meta-chip.difficulty.difficulty-medium {
+  color: #2196f3;
+  background: rgba(33, 150, 243, 0.15);
+}
+
+.custom-meta-chip.difficulty.difficulty-hard {
+  color: #f44336;
+  background: rgba(244, 67, 54, 0.15);
 }
 
 .custom-btn-accept {

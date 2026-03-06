@@ -90,7 +90,11 @@ const Fooldal = () => {
                     stats.completedToday ? 'success' : ''
                   }`}
                 >
-                  {stats.completedToday ? 'Teljesítve! 🎉' : 'Még hátravan ⏳'}
+                  {stats.completedToday
+                    ? 'Napi cél teljesítve! 🎉'
+                    : stats.requiredCount > 0
+                      ? `${stats.completedCount || 0}/${stats.requiredCount} kész ⏳`
+                      : 'Még hátravan ⏳'}
                 </div>
               </div>
               <div className="stat-divider"></div>
@@ -227,27 +231,6 @@ const Fooldal = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div
-        className="footer-controls"
-        data-aos="fade-up"
-        data-aos-offset="0"
-        data-aos-delay="800"
-      >
-        <div className="control-btn" title="Nyelv">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 36 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect width="36" height="8" fill="#CE2939" />
-            <rect y="8" width="36" height="8" fill="white" />
-            <rect y="16" width="36" height="8" fill="#477050" />
-          </svg>
         </div>
       </div>
 

@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import { FaCheckCircle, FaCamera } from 'react-icons/fa';
+import { GiMeditation } from 'react-icons/gi';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
 import InterestsCTA from '../components/InterestsCTA';
+import ChallengeProofModal from '../components/ChallengeProofModal';
 import './CustomChallenges.css';
 
 const CustomChallenges = () => {
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [requiredCount, setRequiredCount] = useState(0);
+  const [completedTotal, setCompletedTotal] = useState(0);
+  const [proofModal, setProofModal] = useState(null);
   useEffect(() => {
     AOS.init({
       once: true,
@@ -29,13 +35,21 @@ const CustomChallenges = () => {
         return;
       }
       const user = JSON.parse(userStr);
+      const token = localStorage.getItem('accessToken');
 
       const response = await fetch(
-        `http://localhost:3300/api/v1/challenges/daily?userId=${user.userId}&type=custom`
+        `http://localhost:3300/api/v1/challenges/daily?userId=${user.userId}&type=custom`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       if (response.ok) {
         const data = await response.json();
-        setChallenges(data);
+        setChallenges(data.challenges || []);
+        setRequiredCount(data.requiredCount || 0);
+        setCompletedTotal(data.completedTotal || 0);
       } else {
         console.error(
           'Failed to fetch challenges:',
@@ -149,6 +163,18 @@ const CustomChallenges = () => {
               <span style={{ color: 'var(--accent-green)' }}>Kihívások</span>
             </h1>
             <div className="custom-hero-subtitle">Alkoss. Fejlődj. Élj.</div>
+            {requiredCount > 0 && (
+              <div className="daily-progress-info">
+                <FaCheckCircle
+                  style={{ color: '#4caf50', marginRight: '6px' }}
+                />{' '}
+                Napi cél: teljesíts <strong>{requiredCount}</strong> kihívást
+                (bármelyik típusból)
+                <span className="daily-progress-count">
+                  {completedTotal} / {requiredCount} kész
+                </span>
+              </div>
+            )}
           </div>
           <div className="custom-challenges-grid">
             <div
@@ -189,12 +215,24 @@ const CustomChallenges = () => {
             <span style={{ color: 'var(--accent-green)' }}>Kihívások</span>
           </h1>
           <div className="custom-hero-subtitle">Alkoss. Fejlődj. Élj.</div>
+          {requiredCount > 0 && (
+            <div className="daily-progress-info">
+              <FaCheckCircle style={{ color: '#4caf50', marginRight: '6px' }} />{' '}
+              Napi cél: teljesíts <strong>{requiredCount}</strong> kihívást
+              (bármelyik típusból)
+              <span className="daily-progress-count">
+                {completedTotal} / {requiredCount} kész
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="custom-challenges-grid">
           {challenges.length === 0 ? (
             <div className="custom-empty-state" data-aos="fade-up">
-              <div className="custom-empty-icon">🧘</div>
+              <div className="custom-empty-icon">
+                <GiMeditation />
+              </div>
               <h3>Nincs egyéni kihívásod mára</h3>
               <p>
                 Úgy tűnik, mára nincs elérhető feladat. Ellenőrizd, hogy
@@ -207,7 +245,7 @@ const CustomChallenges = () => {
             challenges.map((challenge, index) => (
               <div
                 key={challenge.uuid || index}
-                className="custom-challenge-card"
+                className={`custom-challenge-card ${challenge.user_task_status === 1 ? 'challenge-completed' : ''}`}
                 data-aos="fade-up"
                 data-aos-delay={index * 100}
               >
@@ -224,30 +262,54 @@ const CustomChallenges = () => {
                       <span className="custom-coin-icon-small">🪙</span>
                       <span>+{challenge.coin}</span>
                     </div>
-                    <span className="custom-meta-chip difficulty">
-                      {/* Assuming difficulty is a field in tasks logic or we skip it if not present */}
-                      {/* {challenge.difficulty} */ 'Közepes'}
+                    <span
+                      className={`custom-meta-chip difficulty difficulty-${challenge.difficulty || 'medium'}`}
+                    >
+                      {challenge.difficulty === 'easy'
+                        ? 'Könnyű'
+                        : challenge.difficulty === 'hard'
+                          ? 'Nehéz'
+                          : 'Közepes'}
                     </span>
                   </div>
                   <p className="custom-challenge-desc">
                     {challenge.description}
                   </p>
                 </div>
-                <button className="custom-btn-accept">
-                  <span>Elfogadom</span>
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                {challenge.user_task_status === 1 ? (
+                  <div className="custom-btn-completed">
+                    <span>
+                      <FaCheckCircle style={{ marginRight: '4px' }} />{' '}
+                      Teljesítve
+                    </span>
+                  </div>
+                ) : (
+                  <button
+                    className="custom-btn-accept"
+                    onClick={() =>
+                      setProofModal({
+                        challenge,
+                        userTaskId: challenge.user_task_id,
+                      })
+                    }
                   >
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                </button>
+                    <span>
+                      <FaCamera style={{ marginRight: '4px' }} /> Bizonyíték
+                    </span>
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </button>
+                )}
               </div>
             ))
           )}
@@ -256,6 +318,25 @@ const CustomChallenges = () => {
 
       <InterestsCTA />
       <Footer />
+
+      {/* AI Proof Validation Modal */}
+      {proofModal && (
+        <ChallengeProofModal
+          challenge={proofModal.challenge}
+          userTaskId={proofModal.userTaskId}
+          onClose={() => setProofModal(null)}
+          onSuccess={(data) => {
+            setChallenges((prev) =>
+              prev.map((c) =>
+                c.user_task_id === proofModal.userTaskId
+                  ? { ...c, user_task_status: 1 }
+                  : c
+              )
+            );
+            setProofModal(null);
+          }}
+        />
+      )}
     </>
   );
 };

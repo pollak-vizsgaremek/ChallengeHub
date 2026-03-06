@@ -1,13 +1,46 @@
 import { Router } from 'express';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import {
   getAllChallenges,
   getDailyChallenges,
   createChallenge,
   updateChallenge,
   deleteChallenge,
+  submitChallengeProof,
+  getSubmissionsForTask,
+  getRequiredCount,
 } from '../service/challenges.service.js';
 
 const router = Router();
+
+// Multer konfiguráció képfeltöltéshez
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '..', 'uploads', 'proofs'));
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, `proof-${uniqueSuffix}${path.extname(file.originalname)}`);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // Max 10MB
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Csak képfájlok engedélyezettek (JPEG, PNG, WebP, GIF)!'));
+    }
+  },
+});
 
 /**
  * @swagger
@@ -138,8 +171,8 @@ router.get('/daily', async (req, res) => {
   }
 
   try {
-    const challenges = await getDailyChallenges(userId, type);
-    res.status(200).json(challenges);
+    const result = await getDailyChallenges(userId, type);
+    res.status(200).json(result);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Szerver hiba!' });
@@ -231,7 +264,7 @@ router.post('/', async (req, res) => {
         .status(400)
         .json({ message: 'Minden mező kitöltése kötelező!' });
     }
-    const userId = req.user.uuid;
+    const userId = req.user.id;
     const newChallenge = await createChallenge(
       { name, description, xp: Number(xp), coin: Number(coin), categories_id },
       userId
@@ -339,7 +372,7 @@ router.put('/:uuid', async (req, res) => {
         .status(400)
         .json({ message: 'Minden mező kitöltése kötelező!' });
     }
-    const userId = req.user.uuid;
+    const userId = req.user.id;
     const updatedChallenge = await updateChallenge(
       uuid,
       { name, description, xp: Number(xp), coin: Number(coin), categories_id },
@@ -416,6 +449,198 @@ router.delete('/:uuid', async (req, res) => {
       return res.status(404).json({ message: 'A kihívás nem található!' });
     }
     res.status(500).json({ message: 'Szerver hiba a kihívás törlésekor!' });
+  }
+});
+
+/**
+ * @swagger
+ * /challenges/submit-proof:
+ *   post:
+ *     summary: Submit proof for a challenge (AI validated)
+ *     description: Upload an image as proof of completing a challenge. The AI will analyze the image and decide whether the challenge was successfully completed.
+ *     tags:
+ *       - Challenges
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userTaskId
+ *               - proof
+ *             properties:
+ *               userTaskId:
+ *                 type: string
+ *                 description: The UUID of the user_task to submit proof for
+ *                 example: "ut-uuid-123"
+ *               proof:
+ *                 type: string
+ *                 format: binary
+ *                 description: Image file (JPEG, PNG, WebP, GIF, max 10MB)
+ *     responses:
+ *       200:
+ *         description: Proof submitted and validated by AI
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Kihívás sikeresen teljesítve!"
+ *                 verdict:
+ *                   type: string
+ *                   enum: [approved, rejected]
+ *                   example: "approved"
+ *                 confidence:
+ *                   type: number
+ *                   example: 85
+ *                 reasoning:
+ *                   type: string
+ *                   example: "A képen egy futó alkalmazás screenshot látható 5.2 km-es távval."
+ *                 rewarded:
+ *                   type: boolean
+ *                   example: true
+ *                 xpEarned:
+ *                   type: integer
+ *                   example: 50
+ *                 coinEarned:
+ *                   type: integer
+ *                   example: 25
+ *       400:
+ *         description: Missing fields or invalid submission
+ *       500:
+ *         description: Server error
+ */
+router.post('/submit-proof', upload.single('proof'), async (req, res) => {
+  try {
+    const { userTaskId } = req.body;
+    const userId = req.user.id;
+
+    if (!userTaskId) {
+      return res.status(400).json({ message: 'Hiányzó kihívás azonosító!' });
+    }
+
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ message: 'Kérlek tölts fel egy képet bizonyítékként!' });
+    }
+
+    const result = await submitChallengeProof(
+      userTaskId,
+      userId,
+      req.file.path
+    );
+
+    if (result.aiResult.verdict === 'approved') {
+      res.status(200).json({
+        message: 'Kihívás sikeresen teljesítve! 🎉',
+        verdict: 'approved',
+        confidence: result.aiResult.confidence,
+        reasoning: result.aiResult.reasoning,
+        rewarded: true,
+        xpEarned: result.challenge.xp,
+        coinEarned: result.challenge.coin,
+      });
+    } else {
+      res.status(200).json({
+        message: 'Az AI nem fogadta el a bizonyítékot.',
+        verdict: 'rejected',
+        confidence: result.aiResult.confidence,
+        reasoning: result.aiResult.reasoning,
+        rewarded: false,
+        xpEarned: 0,
+        coinEarned: 0,
+      });
+    }
+  } catch (error) {
+    console.error('Submit proof error:', error);
+
+    if (error instanceof multer.MulterError) {
+      if (error.code === 'LIMIT_FILE_SIZE') {
+        return res
+          .status(400)
+          .json({ message: 'A fájl túl nagy! Maximum 10MB engedélyezett.' });
+      }
+      return res.status(400).json({ message: 'Képfeltöltési hiba!' });
+    }
+
+    // Custom hibaüzenetek a service-ből
+    if (
+      error.message.includes('nem található') ||
+      error.message.includes('nem a te') ||
+      error.message.includes('már teljesítve') ||
+      error.message.includes('feldolgozás alatt')
+    ) {
+      return res.status(400).json({ message: error.message });
+    }
+
+    res
+      .status(500)
+      .json({ message: 'Szerver hiba a bizonyíték feldolgozásakor!' });
+  }
+});
+
+/**
+ * @swagger
+ * /challenges/submissions/{userTaskId}:
+ *   get:
+ *     summary: Get submissions for a challenge
+ *     description: Retrieve all AI validation submissions for a specific user task
+ *     tags:
+ *       - Challenges
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userTaskId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User task UUID
+ *     responses:
+ *       200:
+ *         description: List of submissions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   uuid:
+ *                     type: string
+ *                   ai_verdict:
+ *                     type: string
+ *                     enum: [pending, approved, rejected]
+ *                   ai_confidence:
+ *                     type: number
+ *                   ai_reasoning:
+ *                     type: string
+ *                   submitted_at:
+ *                     type: string
+ *                     format: date-time
+ *       400:
+ *         description: Not found or unauthorized
+ *       500:
+ *         description: Server error
+ */
+router.get('/submissions/:userTaskId', async (req, res) => {
+  try {
+    const { userTaskId } = req.params;
+    const userId = req.user.id;
+    const submissions = await getSubmissionsForTask(userTaskId, userId);
+    res.status(200).json(submissions);
+  } catch (error) {
+    console.error(error);
+    if (error.message.includes('nem található')) {
+      return res.status(400).json({ message: error.message });
+    }
+    res.status(500).json({ message: 'Szerver hiba!' });
   }
 });
 
