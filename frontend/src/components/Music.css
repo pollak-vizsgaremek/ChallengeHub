@@ -28,3 +28,10 @@
   background: var(--glass-border-hover, rgba(255, 255, 255, 0.25));
   transform: scale(1.1);
 }
+
+@media (max-width: 768px) {
+  .music-container {
+    bottom: 90px;
+    right: 1.5rem;
+  }
+}

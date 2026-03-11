@@ -125,38 +125,24 @@ export const getDailyChallenges = async (userId, type) => {
       'aktiv',
     ];
 
-    const existingActiveCount = existingTasks.filter((ut) =>
-      activeTypes.includes(ut.tasks.categories?.type?.toLowerCase() || '')
-    ).length;
-    const existingCustomCount = existingTasks.filter(
-      (ut) =>
-        !activeTypes.includes(ut.tasks.categories?.type?.toLowerCase() || '')
-    ).length;
-
-    const needMoreActive = Math.max(0, limit - existingActiveCount);
-    const needMoreCustom = Math.max(0, limit - existingCustomCount);
+    const existingCount = existingTasks.length;
+    const targetCount = limit * 2;
+    const needMore = Math.max(0, targetCount - existingCount);
 
     // If need more challenges to meet the requirement, try to assign more
-    if (needMoreActive > 0 || needMoreCustom > 0) {
+    if (needMore > 0) {
       const interestIds = userInterests.map((ui) => ui.category_id);
       const existingTaskIds = existingTasks.map((ut) => ut.task_id);
 
       const availableTasks = await prisma.tasks.findMany({
         where: {
           categories_id: {
-            in: interestIds.length > 0 ? interestIds : undefined,
+            in: interestIds,
           },
           uuid: { notIn: existingTaskIds }, // ne legyen duplikáció
         },
         include: { categories: true },
       });
-
-      const availableActive = availableTasks.filter((t) =>
-        activeTypes.includes(t.categories?.type?.toLowerCase() || '')
-      );
-      const availableCustom = availableTasks.filter(
-        (t) => !activeTypes.includes(t.categories?.type?.toLowerCase() || '')
-      );
 
       const pickRandom = (pool, count) => {
         if (!pool || pool.length === 0) return [];
@@ -164,9 +150,7 @@ export const getDailyChallenges = async (userId, type) => {
         return shuffled.slice(0, count);
       };
 
-      const extraActive = pickRandom(availableActive, needMoreActive);
-      const extraCustom = pickRandom(availableCustom, needMoreCustom);
-      const extraTasks = [...extraActive, ...extraCustom];
+      const extraTasks = pickRandom(availableTasks, needMore);
 
       if (extraTasks.length > 0) {
         const ops = extraTasks.map((task) =>
@@ -256,31 +240,10 @@ export const getDailyChallenges = async (userId, type) => {
   // Get all tasks based on interests
   const allTasks = await prisma.tasks.findMany({
     where: {
-      categories_id: { in: interestIds.length > 0 ? interestIds : undefined },
+      categories_id: { in: interestIds },
     },
     include: { categories: true },
   });
-
-  // Split into active/custom pools
-  const activeTypes = [
-    'sport',
-    'active',
-    'physical',
-    'movement',
-    'aktív',
-    'aktiv',
-  ];
-
-  // Split into active/custom pools
-  const activePool = allTasks.filter((t) =>
-    activeTypes.includes(t.categories?.type?.toLowerCase() || '')
-  );
-  const customPool = allTasks.filter(
-    (t) => !activeTypes.includes(t.categories?.type?.toLowerCase() || '')
-  );
-
-  // Random selection
-  const selectedTasks = [];
 
   const pickRandom = (pool, count) => {
     if (!pool || pool.length === 0) return [];
@@ -288,10 +251,7 @@ export const getDailyChallenges = async (userId, type) => {
     return shuffled.slice(0, count);
   };
 
-  const dailyActive = pickRandom(activePool, limit);
-  const dailyCustom = pickRandom(customPool, limit);
-
-  const tasksToAssign = [...new Set([...dailyActive, ...dailyCustom])];
+  const tasksToAssign = pickRandom(allTasks, limit * 2);
 
   // Save to user_tasks
   const operations = tasksToAssign.map((task) =>

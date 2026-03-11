@@ -1,0 +1,101 @@
+/* NotFound Page Styles */
+.notfound-container {
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.notfound-box {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 30px;
+  padding: 4rem 3rem;
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.notfound-title {
+  font-size: 8rem;
+  line-height: 1;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, var(--accent-red), var(--accent-yellow));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-family: 'Bangers', cursive;
+  text-shadow: 0 10px 30px rgba(255, 71, 87, 0.3);
+}
+
+.notfound-subtitle {
+  font-size: 2rem;
+  color: var(--text-white);
+  margin-bottom: 2rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.notfound-desc {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 3rem;
+}
+
+.btn-notfound {
+  display: inline-block;
+  padding: 1rem 3rem;
+  background: var(--primary-purple);
+  color: white;
+  text-decoration: none;
+  font-family: 'Bangers', cursive;
+  font-size: 1.5rem;
+  border-radius: 12px;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+}
+
+.btn-notfound:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(108, 92, 231, 0.6);
+  background: var(--gradient-purple);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .notfound-box {
+    padding: 3rem 1.5rem;
+  }
+  
+  .notfound-title {
+    font-size: 6rem;
+  }
+  
+  .notfound-subtitle {
+    font-size: 1.5rem;
+  }
+}

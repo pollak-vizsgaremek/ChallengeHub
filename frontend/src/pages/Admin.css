@@ -438,7 +438,7 @@
   border: 1px solid var(--glass-border);
   border-radius: 20px;
   padding: 1rem;
-  overflow-x: auto;
+  overflow: visible;
 }
 
 .admin-table {
@@ -1326,7 +1326,7 @@
   }
 
   .table-responsive {
-    overflow-x: auto;
+    overflow: visible;
     padding: 0.5rem;
   }
 }

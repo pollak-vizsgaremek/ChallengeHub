@@ -16,9 +16,13 @@ const ProfilePage = lazy(() => import('./pages/Profile'));
 const LeaderboardPage = lazy(() => import('./pages/Leaderboard'));
 const ContactPage = lazy(() => import('./pages/Contact'));
 const AdminPage = lazy(() => import('./pages/Admin'));
+const NotFoundPage = lazy(() => import('./components/NotFound'));
+
 import Music from './components/Music';
 import SessionManager from './components/SessionManager';
+import BackToTop from './components/BackToTop';
 import ProtectedRoute from './guards/ProtectedRoute';
+import GuestRoute from './guards/GuestRoute';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -43,6 +47,7 @@ createRoot(document.getElementById('root')).render(
       />
       <Music />
       <SessionManager />
+      <BackToTop />
       <Suspense
         fallback={
           <div className="loading-container">
@@ -65,8 +70,11 @@ createRoot(document.getElementById('root')).render(
           </Route>
           <Route path="/bolt" element={<ShopPage />} />
           <Route path="/kapcsolat" element={<ContactPage />} />
-          <Route path="/bejelentkezes" element={<LoginPage />} />
-          <Route path="/regisztracio" element={<RegisterPage />} />
+          <Route path="/bejelentkezes" element={<GuestRoute><LoginPage /></GuestRoute>} />
+          <Route path="/regisztracio" element={<GuestRoute><RegisterPage /></GuestRoute>} />
+          
+          {/* Catch-all route for 404 Not Found */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

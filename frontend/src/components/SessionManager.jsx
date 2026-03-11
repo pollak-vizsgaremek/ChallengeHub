@@ -14,6 +14,24 @@ const SessionManager = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Track unique page view per session
+  useEffect(() => {
+    const trackView = async () => {
+      const hasVisited = sessionStorage.getItem('hasVisited');
+      if (!hasVisited) {
+        try {
+          await fetch('http://localhost:3300/api/v1/track-view', {
+            method: 'POST',
+          });
+          sessionStorage.setItem('hasVisited', 'true');
+        } catch (error) {
+          console.error('Hiba az oldalmegtekintés naplózásakor:', error);
+        }
+      }
+    };
+    trackView();
+  }, []);
+
   // Check if user is logged in
   const isLoggedIn = () => {
     return !!localStorage.getItem('accessToken');

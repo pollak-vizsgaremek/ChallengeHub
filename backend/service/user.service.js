@@ -192,6 +192,24 @@ export const updateUserInterests = async (
     where: { user_id: userId },
   });
 
+  // Delete today's uncompleted user_tasks so that challenges can be regenerated 
+  // with the new interests on the next request.
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  await prisma.user_tasks.deleteMany({
+    where: {
+      user_id: userId,
+      status: 0,
+      created_at: {
+        gte: today,
+        lt: tomorrow,
+      },
+    },
+  });
+
   // Create new interests
   const operations = categoryIds.map((catId) =>
     prisma.user_interests.create({

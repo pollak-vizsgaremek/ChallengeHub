@@ -4,7 +4,9 @@ const prisma = new PrismaClient();
 
 export const getDashboardStats = async () => {
   const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const dateStringToday = now.toISOString().split('T')[0];
+  const today = new Date(`${dateStringToday}T00:00:00.000Z`);
+  
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
   const sevenDaysAgo = new Date(today);
@@ -130,14 +132,41 @@ export const getDashboardStats = async () => {
   activities.sort((a, b) => b.timestamp - a.timestamp);
   activities = activities.slice(0, 5);
 
+  // Page Views
+  let pageViewsToday = 0;
+  let pageViewsYesterday = 0;
+
+  const pvTodayRow = await prisma.page_views.findUnique({
+    where: { date: today },
+  });
+  if (pvTodayRow) {
+    pageViewsToday = pvTodayRow.count;
+  }
+
+  const pvYesterdayRow = await prisma.page_views.findUnique({
+    where: { date: yesterday },
+  });
+  if (pvYesterdayRow) {
+    pageViewsYesterday = pvYesterdayRow.count;
+  }
+
+  let pageViewTrend = 0;
+  if (pageViewsYesterday > 0) {
+    pageViewTrend = Math.round(
+      ((pageViewsToday - pageViewsYesterday) / pageViewsYesterday) * 100
+    );
+  } else if (pageViewsToday > 0) {
+    pageViewTrend = 100;
+  }
+
   return {
     totalUsers: {
       value: totalUsers,
       trend: userTrend,
     },
     pageViews: {
-      value: '0',
-      trend: '0',
+      value: pageViewsToday,
+      trend: pageViewTrend,
     },
     todayCompletions: {
       value: completionsToday,
@@ -145,6 +174,40 @@ export const getDashboardStats = async () => {
     },
     recentActivities: activities,
   };
+};
+
+export const trackPageView = async () => {
+  const now = new Date();
+  const dateString = now.toISOString().split('T')[0];
+  const today = new Date(`${dateString}T00:00:00.000Z`);
+
+  try {
+    const existing = await prisma.page_views.findUnique({
+      where: { date: today }
+    });
+
+    if (existing) {
+      await prisma.page_views.update({
+        where: { date: today },
+        data: { count: { increment: 1 } },
+      });
+    } else {
+      await prisma.page_views.create({
+        data: { date: today, count: 1 },
+      });
+    }
+  } catch (error) {
+    if (error.code === 'P2002') {
+      await prisma.page_views.update({
+        where: { date: today },
+        data: { count: { increment: 1 } },
+      });
+    } else {
+      throw error;
+    }
+  }
+
+  return { success: true };
 };
 
 // Get all tickets for admin view

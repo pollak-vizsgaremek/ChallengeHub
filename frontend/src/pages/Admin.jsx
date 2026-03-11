@@ -39,6 +39,8 @@ const Admin = () => {
   // Challenges & Categories tab state
   const [categories, setCategories] = useState([]);
   const [challenges, setChallenges] = useState([]);
+  const [searchChallengeQuery, setSearchChallengeQuery] = useState('');
+  const [filterChallengeCategory, setFilterChallengeCategory] = useState('');
 
   // Modals for Category
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -120,8 +122,8 @@ const Admin = () => {
                     : 'neutral',
             },
             pageViews: {
-              value: data.pageViews?.value || 'N/A',
-              trend: data.pageViews?.trend
+              value: data.pageViews?.value ?? 'N/A',
+              trend: data.pageViews?.trend !== undefined && data.pageViews?.trend !== null
                 ? `${data.pageViews.trend > 0 ? '+' : ''}${data.pageViews.trend}% tegnaphoz képest`
                 : 'Adat nem elérhető',
               trendDirection:
@@ -896,6 +898,42 @@ const Admin = () => {
                     Új Kihívás
                   </button>
                 </div>
+
+                <div className="challenges-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                  <div className="search-wrapper" style={{ flex: 1, margin: 0, minWidth: '250px' }}>
+                    <FaSearch className="search-icon" />
+                    <input
+                      type="text"
+                      placeholder="Keresés név vagy leírás alapján..."
+                      value={searchChallengeQuery}
+                      onChange={(e) => setSearchChallengeQuery(e.target.value)}
+                    />
+                  </div>
+                  <select
+                    value={filterChallengeCategory}
+                    onChange={(e) => setFilterChallengeCategory(e.target.value)}
+                    className="admin-select"
+                    style={{ 
+                      padding: '0.8rem 1.2rem', 
+                      borderRadius: '8px', 
+                      border: '1px solid rgba(255, 255, 255, 0.1)', 
+                      background: 'rgba(255, 255, 255, 0.05)', 
+                      color: 'var(--text-light)', 
+                      minWidth: '200px',
+                      outline: 'none',
+                      cursor: 'pointer',
+                      fontSize: '0.95rem'
+                    }}
+                  >
+                    <option value="" style={{ background: '#1a1a2e', color: '#fff' }}>Minden Kategória</option>
+                    {categories.map((c) => (
+                      <option key={c.uuid} value={c.uuid} style={{ background: '#1a1a2e', color: '#fff' }}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 <div className="table-responsive">
                   <table className="admin-table">
                     <thead>
@@ -908,7 +946,14 @@ const Admin = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {challenges.map((challenge) => (
+                      {challenges
+                        .filter((challenge) => {
+                          const matchesSearch = challenge.name.toLowerCase().includes(searchChallengeQuery.toLowerCase()) || 
+                                                (challenge.description && challenge.description.toLowerCase().includes(searchChallengeQuery.toLowerCase()));
+                          const matchesCategory = filterChallengeCategory === '' || challenge.categories_id === filterChallengeCategory;
+                          return matchesSearch && matchesCategory;
+                        })
+                        .map((challenge) => (
                         <tr key={challenge.uuid}>
                           <td data-label="Kihívás">
                             <div className="user-cell">
@@ -982,10 +1027,15 @@ const Admin = () => {
                           </td>
                         </tr>
                       ))}
-                      {challenges.length === 0 && (
+                      {challenges.filter((challenge) => {
+                          const matchesSearch = challenge.name.toLowerCase().includes(searchChallengeQuery.toLowerCase()) || 
+                                                (challenge.description && challenge.description.toLowerCase().includes(searchChallengeQuery.toLowerCase()));
+                          const matchesCategory = filterChallengeCategory === '' || challenge.categories_id === filterChallengeCategory;
+                          return matchesSearch && matchesCategory;
+                        }).length === 0 && (
                         <tr>
-                          <td colSpan="5" className="no-results">
-                            Nincsenek kihívások.
+                          <td colSpan="5" className="no-results" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                            Nincs találat a keresésre vagy nincsenek kihívások.
                           </td>
                         </tr>
                       )}

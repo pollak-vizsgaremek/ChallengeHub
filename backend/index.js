@@ -14,6 +14,7 @@ import shopController from './controllers/shop.controller.js';
 
 import ticketController from './controllers/ticket.controller.js';
 import adminController from './controllers/admin.controller.js';
+import { trackPageView } from './service/admin.service.js';
 
 import { authMiddleware } from './middleware/auth.middleware.js';
 import endpointAccessMiddleware from './middleware/endpointAccess.middleware.js';
@@ -67,6 +68,16 @@ app.use(
 );
 app.use('/api/v1/tickets', authMiddleware, ticketController);
 app.use('/api/v1/admin', authMiddleware, adminMiddleware, adminController);
+
+app.post('/api/v1/track-view', async (req, res) => {
+  try {
+    const result = await trackPageView();
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Hiba az oldalmegtekintés naplózásakor:', error);
+    res.status(500).json({ message: 'Belső szerverhiba' });
+  }
+});
 
 setupSwagger(app);
 
