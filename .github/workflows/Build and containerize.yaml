@@ -57,7 +57,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=frontend
 
   build-backend:
-    name: Build Backend
+    name: Build Backend 🖥️
     runs-on: ubuntu-latest
 
     steps:

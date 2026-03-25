@@ -9,6 +9,7 @@ COPY package*.json ./
 
 # Install dependencies
 RUN npm ci --only=production && npm cache clean --force
+RUN npx prisma generate
 
 # Copy source code
 COPY . .
