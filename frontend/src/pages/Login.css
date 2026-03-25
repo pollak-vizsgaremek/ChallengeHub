@@ -81,11 +81,31 @@
   background: rgba(0, 0, 0, 0.2);
   border: 2px solid var(--glass-border);
   color: var(--text-white);
-  padding: 1.2rem 1.2rem 1.2rem 3.5rem;
+  padding: 1.2rem 3.2rem 1.2rem 3.5rem;
   border-radius: 15px;
   font-size: 1.1rem;
   font-family: 'Inter', sans-serif;
   transition: all 0.3s ease;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s ease, transform 0.2s ease;
+  z-index: 2;
+}
+
+.password-toggle-btn:hover {
+  color: var(--primary-purple);
+  transform: scale(1.1);
 }
 
 .modern-input:focus {

@@ -24,20 +24,6 @@ model categories {
   @@index([updated_by], map: "categories_ibfk_2")
 }
 
-model reviews {
-  uuid       String   @id @db.VarChar(36)
-  rating     Int
-  comment    String   @db.Text
-  task_id    String   @db.VarChar(36)
-  user_id    String   @db.VarChar(36)
-  created_at DateTime @default(now()) @db.DateTime(0)
-  users      users    @relation(fields: [user_id], references: [uuid], onUpdate: Restrict, map: "reviews_ibfk_1")
-  tasks      tasks    @relation(fields: [task_id], references: [uuid], onUpdate: Restrict, map: "reviews_ibfk_2")
-
-  @@index([task_id, user_id], map: "task_id")
-  @@index([user_id], map: "reviews_ibfk_1")
-}
-
 model tasks {
   uuid                          String       @id @default(uuid()) @db.VarChar(36)
   name                          String       @db.VarChar(128)
@@ -50,7 +36,6 @@ model tasks {
   created_by                    String       @db.VarChar(36)
   updated_at                    DateTime?    @db.DateTime(0)
   updated_by                    String?      @db.VarChar(36)
-  reviews                       reviews[]
   users_tasks_created_byTousers users        @relation("tasks_created_byTousers", fields: [created_by], references: [uuid], onUpdate: Restrict, map: "tasks_ibfk_1")
   users_tasks_updated_byTousers users?       @relation("tasks_updated_byTousers", fields: [updated_by], references: [uuid], onDelete: Restrict, onUpdate: Restrict, map: "tasks_ibfk_2")
   categories                    categories   @relation(fields: [categories_id], references: [uuid], onUpdate: Restrict, map: "tasks_ibfk_3")
@@ -79,9 +64,9 @@ model user_tasks {
   user_id               String                  @db.VarChar(36)
   created_at            DateTime                @default(now()) @db.DateTime(0)
   completed_at          DateTime?               @db.DateTime(0)
+  challenge_submissions challenge_submissions[]
   users                 users                   @relation(fields: [user_id], references: [uuid], onUpdate: Restrict, map: "user_tasks_ibfk_1")
   tasks                 tasks                   @relation(fields: [task_id], references: [uuid], onUpdate: Restrict, map: "user_tasks_ibfk_2")
-  challenge_submissions challenge_submissions[]
 
   @@index([task_id, user_id], map: "task_id")
   @@index([user_id], map: "user_tasks_ibfk_1")
@@ -106,7 +91,6 @@ model users {
   is_banned                               Boolean                @default(false)
   categories_categories_created_byTousers categories[]           @relation("categories_created_byTousers")
   categories_categories_updated_byTousers categories[]           @relation("categories_updated_byTousers")
-  reviews                                 reviews[]
   tasks_tasks_created_byTousers           tasks[]                @relation("tasks_created_byTousers")
   tasks_tasks_updated_byTousers           tasks[]                @relation("tasks_updated_byTousers")
   tickets                                 tickets[]
@@ -150,14 +134,14 @@ model user_endpoint_access {
 }
 
 model challenge_submissions {
-  uuid         String     @id @default(uuid()) @db.VarChar(36)
-  user_task_id String     @db.VarChar(36)
-  image_path   String     @db.VarChar(500)
-  ai_verdict   String     @default("pending") @db.VarChar(20)
-  ai_confidence Float?    @default(0)
-  ai_reasoning String?    @db.Text
-  submitted_at DateTime   @default(now()) @db.DateTime(0)
-  user_tasks   user_tasks @relation(fields: [user_task_id], references: [uuid], onUpdate: Restrict, map: "challenge_submissions_ibfk_1")
+  uuid          String     @id @default(uuid()) @db.VarChar(36)
+  user_task_id  String     @db.VarChar(36)
+  image_path    String     @db.VarChar(500)
+  ai_verdict    String     @default("pending") @db.VarChar(20)
+  ai_confidence Float?     @default(0)
+  ai_reasoning  String?    @db.Text
+  submitted_at  DateTime   @default(now()) @db.DateTime(0)
+  user_tasks    user_tasks @relation(fields: [user_task_id], references: [uuid], onUpdate: Restrict, map: "challenge_submissions_ibfk_1")
 
   @@index([user_task_id], map: "idx_submissions_user_task")
 }
@@ -173,10 +157,11 @@ model tickets {
   created_at  DateTime @default(now()) @db.DateTime(0)
   users       users    @relation(fields: [user_id], references: [uuid], onUpdate: Restrict, map: "fk_tickets_users")
 
+  @@index([user_id], map: "idx_tickets_user_id")
 }
 
 model page_views {
-  uuid       String   @id @default(uuid()) @db.VarChar(36)
-  date       DateTime @unique @db.Date
-  count      Int      @default(0)
+  uuid  String   @id @default(uuid()) @db.VarChar(36)
+  date  DateTime @unique @db.Date
+  count Int      @default(0)
 }

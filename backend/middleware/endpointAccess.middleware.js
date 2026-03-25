@@ -1,7 +1,6 @@
 export default function endpointAccessMiddleware(req, res, next) {
   const user = req.user;
 
-  console.log(user);
 
   // If no user is found
   if (!user) {
