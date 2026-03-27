@@ -12,7 +12,6 @@ RUN npm ci --only=production && npm cache clean --force
 
 # Copy source code
 COPY . .
-RUN npx prisma generate
 
 # Production stage
 FROM node:22-alpine AS production
