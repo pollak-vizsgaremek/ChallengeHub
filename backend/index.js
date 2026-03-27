@@ -32,7 +32,7 @@ if (!fs.existsSync(uploadsDir)) {
 const app = express();
 
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: ['http://localhost:5173', 'https://challenge-hub.pollak.info'],
 };
 
 app.use(express.json());
