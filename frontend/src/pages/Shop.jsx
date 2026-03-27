@@ -7,6 +7,7 @@ import '../styles/shopItems.css';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
 import toast from 'react-hot-toast';
+import { buildApiUrl } from '../utils/api';
 
 const Shop = () => {
   const [coins, setCoins] = useState(null);
@@ -36,7 +37,7 @@ const Shop = () => {
   const fetchUserBalance = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:3300/api/v1/users/balance?userId=${userId}`,
+        buildApiUrl(`/api/v1/users/balance?userId=${userId}`),
         {
           headers: {
             'Content-Type': 'application/json',
@@ -57,7 +58,7 @@ const Shop = () => {
   const fetchPurchasedItems = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:3300/api/v1/shop/purchased?userId=${userId}`,
+        buildApiUrl(`/api/v1/shop/purchased?userId=${userId}`),
         {
           headers: {
             'Content-Type': 'application/json',
@@ -79,7 +80,7 @@ const Shop = () => {
     const fetchShopItems = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3300/api/v1/shop?category=${activeCategory}`,
+          buildApiUrl(`/api/v1/shop?category=${activeCategory}`),
           {
             headers: {
               'Content-Type': 'application/json',
@@ -116,7 +117,7 @@ const Shop = () => {
 
     // Buy item
     try {
-      const response = await fetch('http://localhost:3300/api/v1/shop/buy', {
+      const response = await fetch(buildApiUrl('/api/v1/shop/buy'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

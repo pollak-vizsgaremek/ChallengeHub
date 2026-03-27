@@ -3,6 +3,7 @@ import { useIdleTimer } from 'react-idle-timer';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './SessionManager.css';
 import toast from 'react-hot-toast';
+import { buildApiUrl } from '../utils/api';
 
 // Time constants
 const IDLE_TIMEOUT = 10 * 60 * 10000; // 10 minutes in milliseconds
@@ -20,7 +21,7 @@ const SessionManager = () => {
       const hasVisited = sessionStorage.getItem('hasVisited');
       if (!hasVisited) {
         try {
-          await fetch('http://localhost:3300/api/v1/track-view', {
+          await fetch(buildApiUrl('/api/v1/track-view'), {
             method: 'POST',
           });
           sessionStorage.setItem('hasVisited', 'true');

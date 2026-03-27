@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import '../styles/shopItems.css';
+import { buildApiUrl } from '../utils/api';
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -17,7 +18,7 @@ const Navbar = () => {
   const fetchActiveItems = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:3300/api/v1/shop/active?userId=${userId}`,
+        buildApiUrl(`/api/v1/shop/active?userId=${userId}`),
         {
           headers: {
             'Content-Type': 'application/json',

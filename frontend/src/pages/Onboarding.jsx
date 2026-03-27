@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
 import toast from 'react-hot-toast';
+import { buildApiUrl } from '../utils/api';
 
 const Onboarding = () => {
   const [categories, setCategories] = useState([]);
@@ -46,7 +47,7 @@ const Onboarding = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:3300/api/v1/categories', {
+      const response = await fetch(buildApiUrl('/api/v1/categories'), {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
@@ -82,21 +83,18 @@ const Onboarding = () => {
     const user = JSON.parse(userStr);
 
     try {
-      const response = await fetch(
-        'http://localhost:3300/api/v1/users/erdelokdes',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-          body: JSON.stringify({
-            userId: user.userId,
-            categories: selectedCategories,
-            activityLevel: activityLevel,
-          }),
-        }
-      );
+      const response = await fetch(buildApiUrl('/api/v1/users/erdelokdes'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: JSON.stringify({
+          userId: user.userId,
+          categories: selectedCategories,
+          activityLevel: activityLevel,
+        }),
+      });
 
       if (response.ok) {
         navigate('/');

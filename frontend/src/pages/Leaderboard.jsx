@@ -5,6 +5,7 @@ import './Leaderboard.css';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
 import { FaTrophy, FaMedal, FaCrown, FaBolt } from 'react-icons/fa';
+import { buildApiUrl } from '../utils/api';
 
 const Leaderboard = () => {
   const [user, setUser] = useState(null);
@@ -26,7 +27,7 @@ const Leaderboard = () => {
   const fetchLeaderboard = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:3300/api/v1/users/leaderboard?userId=${userId}`,
+        buildApiUrl(`/api/v1/users/leaderboard?userId=${userId}`),
         {
           headers: {
             'Content-Type': 'application/json',

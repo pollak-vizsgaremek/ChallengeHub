@@ -8,6 +8,7 @@ import Footer from '../components/Footer';
 import InterestsCTA from '../components/InterestsCTA';
 import ChallengeProofModal from '../components/ChallengeProofModal';
 import './ActiveChallenges.css';
+import { buildApiUrl } from '../utils/api';
 
 const ActiveChallenges = () => {
   const [challenges, setChallenges] = useState([]);
@@ -38,7 +39,9 @@ const ActiveChallenges = () => {
       const token = localStorage.getItem('accessToken');
 
       const response = await fetch(
-        `http://localhost:3300/api/v1/challenges/daily?userId=${user.userId}&type=active`,
+        buildApiUrl(
+          `/api/v1/challenges/daily?userId=${user.userId}&type=active`
+        ),
         {
           headers: {
             Authorization: `Bearer ${token}`,

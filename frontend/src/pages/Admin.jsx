@@ -6,6 +6,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { toast } from 'react-hot-toast';
 import { decodeJwt } from '../utils/jwt';
+import { buildApiUrl } from '../utils/api';
 import {
   FaUsers,
   FaTasks,
@@ -99,14 +100,11 @@ const Admin = () => {
 
     const fetchStats = async () => {
       try {
-        const response = await fetch(
-          'http://localhost:3300/api/v1/admin/stats',
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-            },
-          }
-        );
+        const response = await fetch(buildApiUrl('/api/v1/admin/stats'), {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        });
 
         if (response.ok) {
           const data = await response.json();
@@ -123,9 +121,11 @@ const Admin = () => {
             },
             pageViews: {
               value: data.pageViews?.value ?? 'N/A',
-              trend: data.pageViews?.trend !== undefined && data.pageViews?.trend !== null
-                ? `${data.pageViews.trend > 0 ? '+' : ''}${data.pageViews.trend}% tegnaphoz képest`
-                : 'Adat nem elérhető',
+              trend:
+                data.pageViews?.trend !== undefined &&
+                data.pageViews?.trend !== null
+                  ? `${data.pageViews.trend > 0 ? '+' : ''}${data.pageViews.trend}% tegnaphoz képest`
+                  : 'Adat nem elérhető',
               trendDirection:
                 parseInt(data.pageViews?.trend || 0) > 0
                   ? 'positive'
@@ -149,7 +149,7 @@ const Admin = () => {
 
         // Fetch tickets
         const ticketsResponse = await fetch(
-          'http://localhost:3300/api/v1/admin/tickets',
+          buildApiUrl('/api/v1/admin/tickets'),
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
@@ -163,14 +163,11 @@ const Admin = () => {
         }
 
         // Fetch users
-        const usersResponse = await fetch(
-          'http://localhost:3300/api/v1/admin/users',
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-            },
-          }
-        );
+        const usersResponse = await fetch(buildApiUrl('/api/v1/admin/users'), {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        });
 
         if (usersResponse.ok) {
           const usersData = await usersResponse.json();
@@ -180,7 +177,7 @@ const Admin = () => {
 
         // Fetch categories
         const categoriesResponse = await fetch(
-          'http://localhost:3300/api/v1/categories',
+          buildApiUrl('/api/v1/categories'),
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
@@ -195,7 +192,7 @@ const Admin = () => {
 
         // Fetch challenges
         const challengesResponse = await fetch(
-          'http://localhost:3300/api/v1/challenges',
+          buildApiUrl('/api/v1/challenges'),
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
@@ -237,7 +234,7 @@ const Admin = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:3300/api/v1/admin/tickets/${id}/status`,
+        buildApiUrl(`/api/v1/admin/tickets/${id}/status`),
         {
           method: 'PATCH',
           headers: {
@@ -273,7 +270,7 @@ const Admin = () => {
   const handleUpdateRole = async (userId, isAdmin) => {
     try {
       const response = await fetch(
-        `http://localhost:3300/api/v1/admin/users/${userId}/role`,
+        buildApiUrl(`/api/v1/admin/users/${userId}/role`),
         {
           method: 'PATCH',
           headers: {
@@ -298,7 +295,7 @@ const Admin = () => {
   const handleUpdateBan = async (userId, isBanned) => {
     try {
       const response = await fetch(
-        `http://localhost:3300/api/v1/admin/users/${userId}/ban`,
+        buildApiUrl(`/api/v1/admin/users/${userId}/ban`),
         {
           method: 'PATCH',
           headers: {
@@ -328,8 +325,8 @@ const Admin = () => {
     try {
       const isEdit = !!editingCategory;
       const url = isEdit
-        ? `http://localhost:3300/api/v1/categories/${editingCategory.uuid}`
-        : 'http://localhost:3300/api/v1/categories';
+        ? buildApiUrl(`/api/v1/categories/${editingCategory.uuid}`)
+        : buildApiUrl('/api/v1/categories');
       const method = isEdit ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -372,15 +369,12 @@ const Admin = () => {
 
   const executeDeleteCategory = async (uuid) => {
     try {
-      const response = await fetch(
-        `http://localhost:3300/api/v1/categories/${uuid}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-        }
-      );
+      const response = await fetch(buildApiUrl(`/api/v1/categories/${uuid}`), {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
       if (response.ok) {
         setCategories(categories.filter((c) => c.uuid !== uuid));
         // Also remove challenges that belonged to this category
@@ -404,8 +398,8 @@ const Admin = () => {
     try {
       const isEdit = !!editingChallenge;
       const url = isEdit
-        ? `http://localhost:3300/api/v1/challenges/${editingChallenge.uuid}`
-        : 'http://localhost:3300/api/v1/challenges';
+        ? buildApiUrl(`/api/v1/challenges/${editingChallenge.uuid}`)
+        : buildApiUrl('/api/v1/challenges');
       const method = isEdit ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -430,14 +424,11 @@ const Admin = () => {
         });
 
         // Refresh full lists to include nested relationships
-        const challengesRes = await fetch(
-          'http://localhost:3300/api/v1/challenges',
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-            },
-          }
-        );
+        const challengesRes = await fetch(buildApiUrl('/api/v1/challenges'), {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        });
         if (challengesRes.ok) setChallenges(await challengesRes.json());
         toast.success(
           isEdit
@@ -456,15 +447,12 @@ const Admin = () => {
 
   const executeDeleteChallenge = async (uuid) => {
     try {
-      const response = await fetch(
-        `http://localhost:3300/api/v1/challenges/${uuid}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-        }
-      );
+      const response = await fetch(buildApiUrl(`/api/v1/challenges/${uuid}`), {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
       if (response.ok) {
         setChallenges(challenges.filter((c) => c.uuid !== uuid));
         toast.success('Kihívás sikeresen törölve!');
@@ -899,8 +887,19 @@ const Admin = () => {
                   </button>
                 </div>
 
-                <div className="challenges-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-                  <div className="search-wrapper" style={{ flex: 1, margin: 0, minWidth: '250px' }}>
+                <div
+                  className="challenges-filters"
+                  style={{
+                    display: 'flex',
+                    gap: '1rem',
+                    marginBottom: '1.5rem',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <div
+                    className="search-wrapper"
+                    style={{ flex: 1, margin: 0, minWidth: '250px' }}
+                  >
                     <FaSearch className="search-icon" />
                     <input
                       type="text"
@@ -913,21 +912,30 @@ const Admin = () => {
                     value={filterChallengeCategory}
                     onChange={(e) => setFilterChallengeCategory(e.target.value)}
                     className="admin-select"
-                    style={{ 
-                      padding: '0.8rem 1.2rem', 
-                      borderRadius: '8px', 
-                      border: '1px solid rgba(255, 255, 255, 0.1)', 
-                      background: 'rgba(255, 255, 255, 0.05)', 
-                      color: 'var(--text-light)', 
+                    style={{
+                      padding: '0.8rem 1.2rem',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      color: 'var(--text-light)',
                       minWidth: '200px',
                       outline: 'none',
                       cursor: 'pointer',
-                      fontSize: '0.95rem'
+                      fontSize: '0.95rem',
                     }}
                   >
-                    <option value="" style={{ background: '#1a1a2e', color: '#fff' }}>Minden Kategória</option>
+                    <option
+                      value=""
+                      style={{ background: '#1a1a2e', color: '#fff' }}
+                    >
+                      Minden Kategória
+                    </option>
                     {categories.map((c) => (
-                      <option key={c.uuid} value={c.uuid} style={{ background: '#1a1a2e', color: '#fff' }}>
+                      <option
+                        key={c.uuid}
+                        value={c.uuid}
+                        style={{ background: '#1a1a2e', color: '#fff' }}
+                      >
                         {c.name}
                       </option>
                     ))}
@@ -948,93 +956,123 @@ const Admin = () => {
                     <tbody>
                       {challenges
                         .filter((challenge) => {
-                          const matchesSearch = challenge.name.toLowerCase().includes(searchChallengeQuery.toLowerCase()) || 
-                                                (challenge.description && challenge.description.toLowerCase().includes(searchChallengeQuery.toLowerCase()));
-                          const matchesCategory = filterChallengeCategory === '' || challenge.categories_id === filterChallengeCategory;
+                          const matchesSearch =
+                            challenge.name
+                              .toLowerCase()
+                              .includes(searchChallengeQuery.toLowerCase()) ||
+                            (challenge.description &&
+                              challenge.description
+                                .toLowerCase()
+                                .includes(searchChallengeQuery.toLowerCase()));
+                          const matchesCategory =
+                            filterChallengeCategory === '' ||
+                            challenge.categories_id === filterChallengeCategory;
                           return matchesSearch && matchesCategory;
                         })
                         .map((challenge) => (
-                        <tr key={challenge.uuid}>
-                          <td data-label="Kihívás">
-                            <div className="user-cell">
-                              <div className="user-details">
-                                <span className="user-name">
-                                  {challenge.name}
-                                </span>
+                          <tr key={challenge.uuid}>
+                            <td data-label="Kihívás">
+                              <div className="user-cell">
+                                <div className="user-details">
+                                  <span className="user-name">
+                                    {challenge.name}
+                                  </span>
+                                  <span
+                                    className="user-email"
+                                    style={{
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                      maxWidth: '200px',
+                                    }}
+                                  >
+                                    {challenge.description}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+                            <td data-label="Kategória">
+                              {challenge.categories?.name || 'Ismeretlen'}
+                            </td>
+                            <td data-label="Nehézség">
+                              <span
+                                className={`difficulty-badge difficulty-${challenge.difficulty || 'medium'}`}
+                              >
+                                {challenge.difficulty === 'easy'
+                                  ? 'Könnyű'
+                                  : challenge.difficulty === 'hard'
+                                    ? 'Nehéz'
+                                    : 'Közepes'}
+                              </span>
+                            </td>
+                            <td data-label="Jutalom">
+                              <div style={{ display: 'flex', gap: '10px' }}>
                                 <span
-                                  className="user-email"
                                   style={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    maxWidth: '200px',
+                                    color: '#ffaa00',
+                                    fontWeight: 'bold',
                                   }}
                                 >
-                                  {challenge.description}
+                                  {challenge.coin} Coin
+                                </span>
+                                <span
+                                  style={{
+                                    color: '#00ccff',
+                                    fontWeight: 'bold',
+                                  }}
+                                >
+                                  {challenge.xp} XP
                                 </span>
                               </div>
-                            </div>
-                          </td>
-                          <td data-label="Kategória">
-                            {challenge.categories?.name || 'Ismeretlen'}
-                          </td>
-                          <td data-label="Nehézség">
-                            <span
-                              className={`difficulty-badge difficulty-${challenge.difficulty || 'medium'}`}
-                            >
-                              {challenge.difficulty === 'easy'
-                                ? 'Könnyű'
-                                : challenge.difficulty === 'hard'
-                                  ? 'Nehéz'
-                                  : 'Közepes'}
-                            </span>
-                          </td>
-                          <td data-label="Jutalom">
-                            <div style={{ display: 'flex', gap: '10px' }}>
-                              <span
-                                style={{ color: '#ffaa00', fontWeight: 'bold' }}
-                              >
-                                {challenge.coin} Coin
-                              </span>
-                              <span
-                                style={{ color: '#00ccff', fontWeight: 'bold' }}
-                              >
-                                {challenge.xp} XP
-                              </span>
-                            </div>
-                          </td>
-                          <td data-label="Műveletek">
-                            <div className="action-buttons">
-                              <button
-                                className="btn-icon edit"
-                                onClick={() => openChallengeModal(challenge)}
-                              >
-                                <FaEdit />
-                              </button>
-                              <button
-                                className="btn-icon delete"
-                                onClick={() =>
-                                  setDeleteConfirmDialog({
-                                    isOpen: true,
-                                    type: 'challenge',
-                                    id: challenge.uuid,
-                                  })
-                                }
-                              >
-                                <FaTrash />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                            </td>
+                            <td data-label="Műveletek">
+                              <div className="action-buttons">
+                                <button
+                                  className="btn-icon edit"
+                                  onClick={() => openChallengeModal(challenge)}
+                                >
+                                  <FaEdit />
+                                </button>
+                                <button
+                                  className="btn-icon delete"
+                                  onClick={() =>
+                                    setDeleteConfirmDialog({
+                                      isOpen: true,
+                                      type: 'challenge',
+                                      id: challenge.uuid,
+                                    })
+                                  }
+                                >
+                                  <FaTrash />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
                       {challenges.filter((challenge) => {
-                          const matchesSearch = challenge.name.toLowerCase().includes(searchChallengeQuery.toLowerCase()) || 
-                                                (challenge.description && challenge.description.toLowerCase().includes(searchChallengeQuery.toLowerCase()));
-                          const matchesCategory = filterChallengeCategory === '' || challenge.categories_id === filterChallengeCategory;
-                          return matchesSearch && matchesCategory;
-                        }).length === 0 && (
+                        const matchesSearch =
+                          challenge.name
+                            .toLowerCase()
+                            .includes(searchChallengeQuery.toLowerCase()) ||
+                          (challenge.description &&
+                            challenge.description
+                              .toLowerCase()
+                              .includes(searchChallengeQuery.toLowerCase()));
+                        const matchesCategory =
+                          filterChallengeCategory === '' ||
+                          challenge.categories_id === filterChallengeCategory;
+                        return matchesSearch && matchesCategory;
+                      }).length === 0 && (
                         <tr>
-                          <td colSpan="5" className="no-results" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                          <td
+                            colSpan="5"
+                            className="no-results"
+                            style={{
+                              textAlign: 'center',
+                              padding: '2rem',
+                              color: 'var(--text-muted)',
+                            }}
+                          >
                             Nincs találat a keresésre vagy nincsenek kihívások.
                           </td>
                         </tr>

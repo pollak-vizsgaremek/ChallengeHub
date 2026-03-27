@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
+import { buildApiUrl } from '../utils/api';
 
 const Fooldal = () => {
   const [stats, setStats] = useState({
@@ -40,7 +41,7 @@ const Fooldal = () => {
       const user = JSON.parse(userStr);
 
       const response = await fetch(
-        `http://localhost:3300/api/v1/users/stats?userId=${user.userId}`,
+        buildApiUrl(`/api/v1/users/stats?userId=${user.userId}`),
         {
           headers: {
             'Content-Type': 'application/json',

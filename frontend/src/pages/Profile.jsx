@@ -20,6 +20,7 @@ import {
   FaImage,
   FaTag,
 } from 'react-icons/fa';
+import { buildApiUrl } from '../utils/api';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -61,7 +62,7 @@ const Profile = () => {
   useEffect(() => {
     AOS.init({
       once: true,
-      duration: 1000, 
+      duration: 1000,
       offset: 50,
       easing: 'ease-out-cubic',
     });
@@ -81,7 +82,7 @@ const Profile = () => {
   const fetchActiveItems = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:3300/api/v1/shop/active?userId=${userId}`,
+        buildApiUrl(`/api/v1/shop/active?userId=${userId}`),
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
@@ -99,7 +100,7 @@ const Profile = () => {
 
   const handleSetActiveItem = async (itemId, type) => {
     try {
-      const response = await fetch('http://localhost:3300/api/v1/shop/active', {
+      const response = await fetch(buildApiUrl('/api/v1/shop/active'), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -129,7 +130,7 @@ const Profile = () => {
 
   const handleRemoveActiveItem = async (type) => {
     try {
-      const response = await fetch('http://localhost:3300/api/v1/shop/active', {
+      const response = await fetch(buildApiUrl('/api/v1/shop/active'), {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -165,7 +166,7 @@ const Profile = () => {
     if (!itemToSell) return;
 
     try {
-      const response = await fetch('http://localhost:3300/api/v1/shop/sell', {
+      const response = await fetch(buildApiUrl('/api/v1/shop/sell'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -200,7 +201,7 @@ const Profile = () => {
   const fetchProfile = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:3300/api/v1/users/profile?userId=${userId}`,
+        buildApiUrl(`/api/v1/users/profile?userId=${userId}`),
         {
           headers: {
             'Content-Type': 'application/json',
@@ -229,7 +230,7 @@ const Profile = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:3300/api/v1/categories', {
+      const response = await fetch(buildApiUrl('/api/v1/categories'), {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
@@ -245,20 +246,17 @@ const Profile = () => {
 
   const checkExists = async (field, value) => {
     try {
-      const response = await fetch(
-        'http://localhost:3300/api/v1/users/check-exists',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-          body: JSON.stringify({
-            userId: user.userId,
-            [field]: value,
-          }),
-        }
-      );
+      const response = await fetch(buildApiUrl('/api/v1/users/check-exists'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: JSON.stringify({
+          userId: user.userId,
+          [field]: value,
+        }),
+      });
       if (response.ok) {
         const data = await response.json();
         return data;
@@ -332,17 +330,14 @@ const Profile = () => {
         body[field] = formData[field];
       }
 
-      const response = await fetch(
-        'http://localhost:3300/api/v1/users/profile',
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-          body: JSON.stringify(body),
-        }
-      );
+      const response = await fetch(buildApiUrl('/api/v1/users/profile'), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: JSON.stringify(body),
+      });
 
       const data = await response.json();
 
@@ -385,21 +380,18 @@ const Profile = () => {
     }
 
     try {
-      const response = await fetch(
-        'http://localhost:3300/api/v1/users/interests',
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-          body: JSON.stringify({
-            userId: user.userId,
-            categories: selectedInterests,
-            activityLevel: selectedActivityLevel,
-          }),
-        }
-      );
+      const response = await fetch(buildApiUrl('/api/v1/users/interests'), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: JSON.stringify({
+          userId: user.userId,
+          categories: selectedInterests,
+          activityLevel: selectedActivityLevel,
+        }),
+      });
 
       if (response.ok) {
         toast.success('Érdeklődési körök sikeresen frissítve!');

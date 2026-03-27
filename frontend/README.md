@@ -14,3 +14,13 @@ The React Compiler is currently not compatible with SWC. See [this issue](https:
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+## Környezeti változók
+
+Másold le a `.env.example` fájlt `.env` néven a `frontend/` mappába, majd állítsd be az API címet:
+
+```
+VITE_API_BASE_URL=http://localhost:3300
+```
+
+A frontend minden API hívása ezt a címet használja, így helyben és élesben csak ezt kell frissíteni.

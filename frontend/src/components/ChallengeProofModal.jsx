@@ -10,6 +10,7 @@ import {
 import { BsImageFill } from 'react-icons/bs';
 import { HiSparkles } from 'react-icons/hi';
 import './ChallengeProofModal.css';
+import { buildApiUrl } from '../utils/api';
 
 const ChallengeProofModal = ({ challenge, userTaskId, onClose, onSuccess }) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -51,7 +52,7 @@ const ChallengeProofModal = ({ challenge, userTaskId, onClose, onSuccess }) => {
       formData.append('userTaskId', userTaskId);
 
       const response = await fetch(
-        'http://localhost:3300/api/v1/challenges/submit-proof',
+        buildApiUrl('/api/v1/challenges/submit-proof'),
         {
           method: 'POST',
           headers: {

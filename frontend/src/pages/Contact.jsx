@@ -6,6 +6,7 @@ import { Toaster, toast } from 'react-hot-toast';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
 import './Contact.css';
+import { buildApiUrl } from '../utils/api';
 
 const Contact = () => {
   const [activeTab, setActiveTab] = useState('contact');
@@ -58,7 +59,7 @@ const Contact = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3300/api/v1/tickets', {
+      const response = await fetch(buildApiUrl('/api/v1/tickets'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
