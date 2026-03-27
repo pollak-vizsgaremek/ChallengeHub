@@ -26,6 +26,8 @@ RUN addgroup -g 1001 -S nodejs && \
 # Copy built application from builder stage
 COPY --from=builder --chown=nextjs:nodejs /app /app
 
+RUN chown -R nextjs:nodejs /app
+
 # Switch to non-root user
 USER nextjs
 
