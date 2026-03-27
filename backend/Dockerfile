@@ -13,9 +13,6 @@ RUN npm ci --only=production && npm cache clean --force
 # Copy source code
 COPY . .
 
-# Generate Prisma client for the target runtime (alpine/musl)
-RUN npx prisma generate --schema=prisma/schema.prisma
-
 # Production stage
 FROM node:22-alpine AS production
 
