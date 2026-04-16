@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Toaster, toast } from 'react-hot-toast';
@@ -9,9 +9,11 @@ import './Contact.css';
 import { buildApiUrl } from '../utils/api';
 
 const Contact = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('contact');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userId, setUserId] = useState(null);
+  const [passwordEmail, setPasswordEmail] = useState('');
   const [formData, setFormData] = useState({
     type: '',
     title: '',
@@ -24,6 +26,11 @@ const Contact = () => {
       once: true,
       duration: 1000,
     });
+
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('tab') === 'password') {
+      setActiveTab('password');
+    }
 
     const userStr = localStorage.getItem('user');
     if (userStr) {
@@ -43,6 +50,36 @@ const Contact = () => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handlePasswordReset = async (e) => {
+    e.preventDefault();
+    if (!passwordEmail) {
+      toast.error('Kérlek add meg az e-mail címedet!');
+      return;
+    }
+
+    try {
+      const response = await fetch(buildApiUrl('/api/v1/auth/forgot-password'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: passwordEmail }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(data.message || 'Jelszó visszaállítási kérelem beküldve!');
+        setPasswordEmail('');
+      } else {
+        toast.error(data.message || 'Ismeretlen hiba történt!');
+      }
+    } catch (error) {
+      console.error('Password reset error:', error);
+      toast.error('Szerver hiba! Próbáld újra később.');
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -125,6 +162,12 @@ const Contact = () => {
               onClick={() => setActiveTab('bug')}
             >
               Hibabejelentés
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'password' ? 'active' : ''}`}
+              onClick={() => setActiveTab('password')}
+            >
+              Jelszó-visszaállítás
             </button>
           </div>
 
@@ -299,6 +342,47 @@ const Contact = () => {
                   </div>
                 </div>
               </div>
+            ) : activeTab === 'password' ? (
+              <form className="bug-form password-form" onSubmit={handlePasswordReset}>
+                <div className="form-group" data-aos="fade-up" data-aos-delay="0">
+                  <label className="form-label">Regisztrált E-mail Címed</label>
+                  <div className="input-group">
+                    <input
+                      type="email"
+                      className="modern-input"
+                      placeholder="Ide írd az e-mail címed..."
+                      value={passwordEmail}
+                      onChange={(e) => setPasswordEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="btn-submit"
+                  data-aos="fade-up"
+                  data-aos-delay="100"
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                  Új jelszó igénylése az Admintól
+                </button>
+                <div style={{ marginTop: '1.5rem', color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center' }}>
+                  A kérelem egy kiemelt prioritású hibajegyként fog megjelenni az adminisztrátorok számára.
+                </div>
+              </form>
             ) : isLoggedIn ? (
               <form className="bug-form" onSubmit={handleSubmit}>
                 <div

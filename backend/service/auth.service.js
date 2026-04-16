@@ -107,3 +107,28 @@ export const register = async (username, email, password, passwordConfirm) => {
 
   return newUser.uuid;
 };
+
+// Forgot Password Request
+export const forgotPassword = async (email) => {
+  const user = await prisma.users.findFirst({
+    where: { email },
+  });
+
+  if (!user) {
+    return false;
+  }
+
+  await prisma.tickets.create({
+    data: {
+      uuid: crypto.randomUUID(),
+      user_id: user.uuid,
+      type: 'Elfelejtett jelszó',
+      title: 'Jelszó-visszaállítási kérelem',
+      description: `A(z) ${email} e-mail címmel rendelkező felhasználó jelszó-visszaállítást igényelt. Kérlek vedd fel vele a kapcsolatot vagy rendelj hozzá új jelszót.`,
+      priority: 'Magas',
+      status: 'open',
+    },
+  });
+
+  return true;
+};

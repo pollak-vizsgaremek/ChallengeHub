@@ -336,6 +336,7 @@ const CustomChallenges = () => {
                   : c
               )
             );
+            setCompletedTotal((prev) => prev + 1);
             setProofModal(null);
           }}
         />

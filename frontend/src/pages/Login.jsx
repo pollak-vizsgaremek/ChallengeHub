@@ -207,9 +207,9 @@ const Login = () => {
                 className="form-options"
                 style={{ justifyContent: 'flex-end' }}
               >
-                <a href="#" className="forgot-password">
+                <Link to="/kapcsolat?tab=password" className="forgot-password">
                   Elfelejtett jelszó?
-                </a>
+                </Link>
               </div>
 
               <div className="captcha-container">

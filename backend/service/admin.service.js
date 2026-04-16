@@ -14,22 +14,23 @@ export const getDashboardStats = async () => {
 
   // Total Users
   const totalUsers = await prisma.users.count();
-  const usersSevenDaysAgo = await prisma.users.count({
+  const usersYesterday = await prisma.users.count({
     where: {
       registered_at: {
-        lt: sevenDaysAgo,
+        lt: today,
       },
     },
   });
 
   // Trend
   let userTrend = 0;
-  if (usersSevenDaysAgo > 0) {
-    userTrend = Math.round(
-      ((totalUsers - usersSevenDaysAgo) / usersSevenDaysAgo) * 100
-    );
-  } else if (totalUsers > 0) {
+  const newUsers = totalUsers - usersYesterday;
+  if (usersYesterday > 0) {
+    userTrend = Math.round((newUsers / usersYesterday) * 100);
+  } else if (newUsers > 0) {
     userTrend = 100;
+  } else {
+    userTrend = 0;
   }
 
   // Today's Completions

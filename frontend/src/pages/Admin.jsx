@@ -111,7 +111,7 @@ const Admin = () => {
           setDashboardData({
             totalUsers: {
               value: data.totalUsers.value,
-              trend: `${data.totalUsers.trend > 0 ? '+' : ''}${data.totalUsers.trend}% az elmúlt 7 napban`,
+              trend: `${data.totalUsers.trend > 0 ? '+' : ''}${data.totalUsers.trend}% tegnaphoz képest`,
               trendDirection:
                 data.totalUsers.trend > 0
                   ? 'positive'
@@ -1114,8 +1114,19 @@ const Admin = () => {
                         <span className="ticket-id">
                           #{ticket.uuid.substring(0, 8)}
                         </span>
-                        <h4 className="ticket-title">{ticket.title}</h4>
+                        <h4 className="ticket-title">
+                          {ticket.type === 'Elfelejtett jelszó' && (
+                            <span style={{ color: '#ff4d4d', marginRight: '8px' }}>🔑 Jelszó:</span>
+                          )}
+                          {ticket.title}
+                        </h4>
                         <span className="ticket-user">
+                          <span style={{ backgroundColor: 'var(--bg-card-hover)', border: '1px solid var(--border-color)', color: 'var(--text-bright)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem', marginRight: '8px' }}>
+                            {ticket.type === 'Design' ? 'Kinézeti hiba' : 
+                             ticket.type === 'Bug' ? 'Működési hiba' : 
+                             ticket.type === 'Account' ? 'Fiók probléma' : 
+                             ticket.type === 'Other' ? 'Egyéb' : ticket.type}
+                          </span>
                           Beküldte: {ticket.users.username}
                         </span>
                         <span className="ticket-date">

@@ -34,8 +34,6 @@ function getMimeType(filePath) {
 // Validating challenge proof with AI
 export const validateChallengeWithAI = async (imagePath, challenge) => {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-
     const mimeType = getMimeType(imagePath);
     const imagePart = fileToGenerativePart(imagePath, mimeType);
 
@@ -166,44 +164,76 @@ Az eredmény/alkotás fotója
   "reasoning": "Rövid magyar nyelvű indoklás (max 2-3 mondat)"
 }`;
 
-    const result = await model.generateContent([prompt, imagePart]);
-    const response = await result.response;
-    const text = response.text();
+    const modelsToTry = ['gemini-1.5-flash', 'gemini-1.5-flash-8b', 'gemini-2.5-flash', 'gemini-1.0-pro-vision-latest'];
+    let lastError = null;
 
-    // JSON cuting out from the response
-    const jsonMatch = text.match(/\{[\s\S]*?\}/);
-    if (!jsonMatch) {
-      console.error('AI response was not valid JSON:', text);
-      return {
-        verdict: 'rejected',
-        confidence: 0,
-        reasoning:
-          'Az AI nem tudta elemezni a képet. Kérlek próbáld újra egy tisztább fotóval.',
-      };
+    for (const modelName of modelsToTry) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent([prompt, imagePart]);
+        const response = await result.response;
+        const text = response.text();
+
+        // JSON cuting out from the response
+        const jsonMatch = text.match(/\{[\s\S]*?\}/);
+        if (!jsonMatch) {
+          console.error(`AI response was not valid JSON from ${modelName}:`, text);
+          return {
+            verdict: 'rejected',
+            confidence: 0,
+            reasoning:
+              'Az AI nem tudta elemezni a képet. Kérlek próbáld újra egy tisztább fotóval.',
+          };
+        }
+
+        const parsed = JSON.parse(jsonMatch[0]);
+        const confidence = Math.min(100, Math.max(0, Number(parsed.confidence) || 0));
+
+        return {
+          verdict: parsed.verdict === 'approved' && confidence >= 80 ? 'approved' : 'rejected',
+          confidence: confidence,
+          reasoning: 
+            (parsed.verdict === 'approved' && confidence < 80)
+            ? 'A kép relevánsnak tűnik, de a bizonyosság (80%) alatti. Kérlek tölts fel egy egyértelműbb képet!' 
+            : (parsed.reasoning || 'Nem áll rendelkezésre részletes indoklás.'),
+        };
+      } catch (error) {
+        console.warn(`Model ${modelName} failed:`, error.message);
+        lastError = error;
+        // Continue to fallback model if it's a rate limit or server error
+        if (
+          error.message?.includes('503') ||
+          error.message?.includes('high demand') ||
+          error.message?.includes('429') ||
+          error.message?.includes('quota') ||
+          error.message?.includes('404') ||
+          error.message?.includes('not found')
+        ) {
+          continue; // Try next model
+        } else {
+          throw error; // Other errors (API key, etc.) abort immediately
+        }
+      }
     }
 
-    const parsed = JSON.parse(jsonMatch[0]);
-
-    return {
-      verdict: parsed.verdict === 'approved' ? 'approved' : 'rejected',
-      confidence: Math.min(100, Math.max(0, Number(parsed.confidence) || 0)),
-      reasoning:
-        parsed.reasoning || 'Nem áll rendelkezésre részletes indoklás.',
-    };
+    // If both models failed with high demand etc
+    throw lastError;
   } catch (error) {
     console.error('AI validation error:', error.message || error);
 
-    // Rate limit or qouta error
+    // Rate limit or qouta or high demand error
     if (
       error.message?.includes('429') ||
       error.message?.includes('quota') ||
-      error.message?.includes('Too Many Requests')
+      error.message?.includes('Too Many Requests') ||
+      error.message?.includes('503') ||
+      error.message?.includes('high demand')
     ) {
       return {
         verdict: 'rejected',
         confidence: 0,
         reasoning:
-          'Az AI szolgáltatás elérte a napi limitet. Kérlek próbáld újra néhány perc múlva, vagy holnap.',
+          'Az AI szolgáltatás jelenleg túlterhelt vagy elérte a limitet. Kérlek, próbáld újra pár perc múlva!',
       };
     }
 

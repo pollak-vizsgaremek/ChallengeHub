@@ -292,6 +292,7 @@ const ActiveChallenges = () => {
                   : c
               )
             );
+            setCompletedTotal((prev) => prev + 1);
             setProofModal(null);
           }}
         />

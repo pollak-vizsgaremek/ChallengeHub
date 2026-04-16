@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { login, register } from '../service/auth.service.js';
+import { login, register, forgotPassword } from '../service/auth.service.js';
 
 const router = Router();
 
@@ -251,6 +251,54 @@ router.post('/regisztracio', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(400).json({ message: error.message });
+  }
+});
+
+/**
+ * @swagger
+ * /auth/forgot-password:
+ *   post:
+ *     summary: Request a password reset
+ *     description: Endpoint for users who forgot their password to request help from an admin.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: User's registered email address
+ *     responses:
+ *       200:
+ *         description: Request submitted successfully
+ *       400:
+ *         description: Missing param or user not found
+ */
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: 'Hiányzó email cím!' });
+  }
+
+  try {
+    const success = await forgotPassword(email);
+
+    if (success) {
+      res.status(200).json({ message: 'Jelszó visszaállítási kérelem beküldve az adminisztrátoroknak!' });
+    } else {
+      res.status(400).json({ message: 'Nem található felhasználó ezzel az email címmel!' });
+    }
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ message: 'Szerver hiba történt!' });
   }
 });
 
