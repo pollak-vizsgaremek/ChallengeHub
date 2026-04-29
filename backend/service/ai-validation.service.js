@@ -164,7 +164,7 @@ Az eredmény/alkotás fotója
   "reasoning": "Rövid magyar nyelvű indoklás (max 2-3 mondat)"
 }`;
 
-    const modelsToTry = ['gemini-1.5-flash', 'gemini-1.5-flash-8b', 'gemini-2.5-flash', 'gemini-1.0-pro-vision-latest'];
+    const modelsToTry = ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-2.5-flash', 'gemini-1.5-pro'];
     let lastError = null;
 
     for (const modelName of modelsToTry) {

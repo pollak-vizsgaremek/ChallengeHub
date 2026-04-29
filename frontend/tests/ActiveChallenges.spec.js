@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { setAuthenticatedSession } from './helpers/auth';
 
-test('active challenges', async ({ page }) => {
-  await page.goto('http://localhost:5173/');
+test('Aktiv kihivasok oldal betoltodik', async ({ page }) => {
+  await setAuthenticatedSession(page);
+  await page.goto('/aktiv-kihivasok');
 
-    // Click the active challenges link.
-    await page.getByRole('link', { name: 'Active Challenges' }).click();
-    // Expects page to have a heading with the name of Active Challenges.
-    await expect(page.getByRole('heading', { name: 'Active Challenges' })).toBeVisible();
+  await expect(page).toHaveURL(/\/aktiv-kihivasok/);
+  await expect(page.locator('.active-hero-title')).toBeVisible();
 });

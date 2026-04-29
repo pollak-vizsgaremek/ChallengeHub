@@ -2,6 +2,8 @@
 
 # 🏆 ChallengeHub
 
+**Egy modern, mesterséges intelligenciával támogatott kihívás-platform, ahol a felhasználók böngészhetnek, létrehozhatnak és teljesíthetnek kihívásokat.**
+
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express-5-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
@@ -17,8 +19,8 @@
 
 | Erőforrás | Link |
 |---|---|
-| 📄 Google Dokumentáció | https://docs.google.com/document/d/1LywTYz7P9tSC847iAAZr0Xbdza5jPRxyxShXGOh9gHE/edit?usp=sharing |
-| 🎨 Figma terv / Prototípus | https://www.figma.com/design/ylMzOZ7ZMRJbs8OsFEGz8K/ChallengeHUB?node-id=0-1&t=FUzqrhtAJAZWeviQ-1 |
+| 📄 Google Dokumentáció | *[ide jön a link]* |
+| 🎨 Figma terv / Prototípus | *[ide jön a link]* |
 | 📘 Swagger API Docs (helyi) | `http://localhost:3000/api-docs` |
 
 ---
@@ -106,7 +108,7 @@ git clone https://github.com/your-org/ChallengeHub.git
 cd ChallengeHub
 ```
 
-### 2️⃣ Alap fájlok telepítése
+### 2️⃣ Függőségek telepítése
 
 ```bash
 # Gyökér (concurrently runner)
@@ -119,12 +121,13 @@ npm install --prefix backend
 npm install --prefix frontend
 ```
 
-### 3️⃣ Env beállítása
+### 3️⃣ Környezeti változók beállítása
 
 **Backend** — hozd létre a `backend/.env` fájlt:
 
 ```env
 DATABASE_URL="mysql://felhasznalo:jelszo@localhost:3306/challengehub"
+JWT_SECRET="titkos_kulcs_ide"
 GEMINI_API_KEY="google_ai_api_kulcs_ide"
 ```
 
@@ -176,6 +179,7 @@ npx playwright test --prefix frontend
 
 > [!NOTE]
 > A Playwright tesztek futtatásához az alkalmazásnak futnia kell (`npm run dev`).
+
 ---
 
 ## 📄 Licenc
