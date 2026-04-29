@@ -1,9 +1,0 @@
-1. Reszponívitás javítása minden oldalon
-6. env fálj törlése githubról!
-7. FONTOS az összes swaggert átkell nézni mert az adatok nem valósak egyenlőre pl user id!
-
-Megcsináltam az akítv és egyéni kihívások oldalnk a designjét. Még egyenlőre tömből jönnek az adatok
-majd megkell csinlni hogy adatbézisből jöjjön. Illetve majd csak ez akkor lehet látható habevan jelentkezve.
-Egyenlőre csak a design van kész!
-
-TEST COMMIT
